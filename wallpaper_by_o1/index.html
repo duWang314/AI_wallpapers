@@ -1,0 +1,135 @@
+<html>
+<head>
+<meta charset=“utf-8” />
+<title>炫酷互动桌面壁纸</title>
+<style>
+/* 页面默认样式重置 */
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+}
+body {
+overflow: hidden; /* 隐藏滚动条 */
+background: #000; /* 默认黑色背景 */
+user-select: none; /* 防止选中文本 */
+}
+/* 让画布全屏展示 */
+canvas {
+display: block;
+}
+/* 以防在页面缩放时出现滚动条 */
+html, body {
+width: 100%;
+height: 100%;
+}
+</style>
+</head>
+<body>
+<canvas id=“starCanvas”></canvas>
+
+<script>
+    // 获取画布及其上下文
+    const canvas = document.getElementById('starCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // 令画布大小与窗口相同
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    // 存储所有星星的数组
+    let starsArray = [];
+
+    // 鼠标位置(用作交互)
+    let mouse = {
+        x: null,
+        y: null
+    };
+
+    // 监听鼠标移动事件
+    window.addEventListener('mousemove', function (e) {
+        mouse.x = e.x;
+        mouse.y = e.y;
+    });
+
+    // 监听窗口大小调整
+    window.addEventListener('resize', function () {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        initStars();
+    });
+
+    // 星星对象构造函数
+    function Star(x, y, speed, radius, color) {
+        this.x = x;
+        this.y = y;
+        this.speed = speed; // 每帧移动距离
+        this.radius = radius;
+        this.color = color;
+
+        // 绘制星星的方法
+        this.draw = function () {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.fillStyle = this.color;
+            ctx.fill();
+        }
+
+        // 更新星星位置的方法
+        this.update = function () {
+            // 简单地纵向移动星星，实现星空流动效果
+            this.y += this.speed;
+
+            // 当星星超出屏幕底部后，将其重置到顶部重新开始
+            if (this.y - this.radius > canvas.height) {
+                this.x = Math.random() * canvas.width;
+                this.y = -this.radius;
+            }
+
+            // 如果鼠标在页面内，则根据鼠标位置略微改变星星移动方向
+            if (mouse.x && mouse.y) {
+                // 简单示例：当鼠标在画布左侧或右侧时，星星略微产生横向偏移
+                let dx = this.x - mouse.x;
+                // 根据距离鼠标远近，稍作星星在 x 方向上的位移
+                this.x -= dx * 0.0002; 
+            }
+
+            // 绘制更新后的星星
+            this.draw();
+        }
+    }
+
+    // 初始化星星
+    function initStars() {
+        starsArray = [];
+        const starCount = 300; // 可自行修改星星的数量
+        for (let i = 0; i < starCount; i++) {
+            let x = Math.random() * canvas.width;
+            let y = Math.random() * canvas.height;
+            let speed = 0.5 + Math.random() * 1; // 移动速度
+            let radius = Math.random() * 2; // 大小
+            // 给星星一个随机颜色，增强视觉效果
+            let color = `hsl(${Math.random() * 360}, 75%, 80%)`;
+            
+            starsArray.push(new Star(x, y, speed, radius, color));
+        }
+    }
+
+    // 动画循环
+    function animate() {
+        requestAnimationFrame(animate);
+        // 清除上一帧图像
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // 逐个更新并绘制星星
+        for (let star of starsArray) {
+            star.update();
+        }
+    }
+
+    // 执行初始化并开始动画
+    initStars();
+    animate();
+</script>
+</body>
+</html>
