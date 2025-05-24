@@ -1,0 +1,14 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden; /* 隐藏滚动条 */
+    background-color: #1a1a2e; /* 深邃的背景色 */
+}
+
+#particleCanvas {
+    display: block; /* 确保 canvas 占据整个视口 */
+    width: 100%;
+    height: 100%;
+}

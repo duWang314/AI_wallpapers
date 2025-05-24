@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>炫酷互动桌面壁纸</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: linear-gradient(135deg, #0f2027, #2c5364 80%);
+    }
+    #wallpaper-canvas {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      width: 100vw;
+      height: 100vh;
+      display: block;
+      z-index: 1;
+    }
+    .theme-toggle {
+      position: absolute;
+      top: 30px;
+      right: 40px;
+      z-index: 2;
+      background: rgba(30,40,60,0.7);
+      color: #fff;
+      border: none;
+      border-radius: 20px;
+      padding: 10px 24px;
+      font-size: 1.1em;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .theme-toggle:hover {
+      background: rgba(60,80,120,0.9);
+    }
+  </style>
+</head>
+<body>
+  <canvas id="wallpaper-canvas"></canvas>
+  <button class="theme-toggle" id="themeBtn">切换主题</button>
+  <script>
+    // 主题色方案
+    const themes = [
+      {bg: ['#0f2027', '#2c5364'], particle: '#00ffe7', line: '#00ffe7'},
+      {bg: ['#232526', '#ff512f'], particle: '#ff512f', line: '#ff512f'},
+      {bg: ['#1a2980', '#26d0ce'], particle: '#26d0ce', line: '#26d0ce'},
+      {bg: ['#000428', '#004e92'], particle: '#fff', line: '#fff'}
+    ];
+    let themeIndex = 0;
+
+    // 设置背景渐变
+    function setBackground() {
+      document.body.style.background = `linear-gradient(135deg, ${themes[themeIndex].bg[0]}, ${themes[themeIndex].bg[1]} 80%)`;
+    }
+    setBackground();
+
+    // 粒子参数
+    const canvas = document.getElementById('wallpaper-canvas');
+    const ctx = canvas.getContext('2d');
+    let W = window.innerWidth, H = window.innerHeight;
+    canvas.width = W;
+    canvas.height = H;
+
+    let particles = [];
+    const PARTICLE_NUM = 80;
+    const MAX_DIST = 160;
+
+    function random(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    function createParticle() {
+      return {
+        x: random(0, W),
+        y: random(0, H),
+        vx: random(-0.7, 0.7),
+        vy: random(-0.7, 0.7),
+        r: random(1.5, 3.5)
+      };
+    }
+
+    function initParticles() {
+      particles = [];
+      for (let i = 0; i < PARTICLE_NUM; i++) {
+        particles.push(createParticle());
+      }
+    }
+    initParticles();
+
+    // 鼠标交互
+    let mouse = {x: null, y: null};
+    canvas.addEventListener('mousemove', e => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+    canvas.addEventListener('mouseleave', () => {
+      mouse.x = null;
+      mouse.y = null;
+    });
+    canvas.addEventListener('click', e => {
+      // 点击时生成一圈粒子爆炸
+      for (let i = 0; i < 12; i++) {
+        let angle = (Math.PI * 2 / 12) * i;
+        particles.push({
+          x: e.clientX,
+          y: e.clientY,
+          vx: Math.cos(angle) * 2.5,
+          vy: Math.sin(angle) * 2.5,
+          r: random(2, 4)
+        });
+      }
+    });
+
+    // 动画主循环
+    function animate() {
+      ctx.clearRect(0, 0, W, H);
+      // 粒子运动
+      for (let p of particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+        // 边界反弹
+        if (p.x < 0 || p.x > W) p.vx *= -1;
+        if (p.y < 0 || p.y > H) p.vy *= -1;
+      }
+      // 画粒子
+      for (let p of particles) {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = themes[themeIndex].particle;
+        ctx.globalAlpha = 0.8;
+        ctx.fill();
+      }
+      ctx.globalAlpha = 0.25;
+      // 画连线
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          let dx = particles[i].x - particles[j].x;
+          let dy = particles[i].y - particles[j].y;
+          let dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < MAX_DIST) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = themes[themeIndex].line;
+            ctx.lineWidth = 1.2 - dist / MAX_DIST;
+            ctx.stroke();
+          }
+        }
+      }
+      ctx.globalAlpha = 1;
+      // 鼠标吸引
+      if (mouse.x !== null && mouse.y !== null) {
+        for (let p of particles) {
+          let dx = mouse.x - p.x;
+          let dy = mouse.y - p.y;
+          let dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 120) {
+            p.vx += dx * 0.0005;
+            p.vy += dy * 0.0005;
+          }
+        }
+      }
+      // 控制粒子数量
+      if (particles.length > PARTICLE_NUM) {
+        particles.splice(0, particles.length - PARTICLE_NUM);
+      }
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    // 主题切换
+    document.getElementById('themeBtn').onclick = function() {
+      themeIndex = (themeIndex + 1) % themes.length;
+      setBackground();
+    };
+
+    // 自适应窗口
+    window.addEventListener('resize', () => {
+      W = window.innerWidth;
+      H = window.innerHeight;
+      canvas.width = W;
+      canvas.height = H;
+      initParticles();
+    });
+  </script>
+</body>
+</html>
