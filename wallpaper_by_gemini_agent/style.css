@@ -1,9 +1,0 @@
-body {
-    margin: 0;
-    overflow: hidden; /* 隐藏滚动条 */
-    background-color: #000; /* 设置背景色为黑色 */
-}
-
-canvas {
-    display: block; /* 移除 canvas 下方的额外空间 */
-} 
