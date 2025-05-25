@@ -1,0 +1,159 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #121212 0%, #2d3436 100%);
+    color: #ffffff;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+}
+
+.container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* Time and Date Display */
+.time-display {
+    position: absolute;
+    bottom: 50px;
+    left: 50px;
+    z-index: 10;
+    font-family: 'Consolas', monospace;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+}
+
+.time {
+    font-size: 5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.date {
+    font-size: 1.5rem;
+    opacity: 0.8;
+}
+
+/* Particles */
+.particles-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.particle {
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+/* Geometric Shapes */
+.geometric-shapes {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.shape {
+    position: absolute;
+    border: 2px solid rgba(0, 255, 255, 0.4);
+    border-radius: 50%;
+    animation: float 15s infinite ease-in-out;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+}
+
+.shape1 {
+    width: 200px;
+    height: 200px;
+    top: 20%;
+    right: 15%;
+    animation-delay: 0s;
+    background: radial-gradient(circle at 30% 30%, rgba(0, 255, 255, 0.1), transparent 80%);
+}
+
+.shape2 {
+    width: 300px;
+    height: 300px;
+    bottom: 10%;
+    right: 25%;
+    animation-delay: -2s;
+    border-color: rgba(255, 90, 95, 0.4);
+    box-shadow: 0 0 20px rgba(255, 90, 95, 0.2);
+    background: radial-gradient(circle at 30% 30%, rgba(255, 90, 95, 0.1), transparent 80%);
+}
+
+.shape3 {
+    width: 150px;
+    height: 150px;
+    top: 30%;
+    left: 20%;
+    animation-delay: -4s;
+    border-color: rgba(255, 200, 0, 0.4);
+    box-shadow: 0 0 20px rgba(255, 200, 0, 0.2);
+    background: radial-gradient(circle at 30% 30%, rgba(255, 200, 0, 0.1), transparent 80%);
+}
+
+.shape4 {
+    width: 250px;
+    height: 250px;
+    bottom: 25%;
+    left: 10%;
+    animation-delay: -6s;
+    border-color: rgba(90, 255, 200, 0.4);
+    box-shadow: 0 0 20px rgba(90, 255, 200, 0.2);
+    background: radial-gradient(circle at 30% 30%, rgba(90, 255, 200, 0.1), transparent 80%);
+}
+
+.shape5 {
+    width: 180px;
+    height: 180px;
+    top: 15%;
+    left: 50%;
+    animation-delay: -8s;
+    border-color: rgba(180, 90, 255, 0.4);
+    box-shadow: 0 0 20px rgba(180, 90, 255, 0.2);
+    background: radial-gradient(circle at 30% 30%, rgba(180, 90, 255, 0.1), transparent 80%);
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    25% {
+        transform: translateY(-20px) rotate(5deg);
+    }
+    50% {
+        transform: translateY(0) rotate(0deg);
+    }
+    75% {
+        transform: translateY(20px) rotate(-5deg);
+    }
+}
+
+/* Hover effects */
+.container:hover .shape {
+    animation-play-state: paused;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .time {
+        font-size: 3rem;
+    }
+    
+    .date {
+        font-size: 1rem;
+    }
+}

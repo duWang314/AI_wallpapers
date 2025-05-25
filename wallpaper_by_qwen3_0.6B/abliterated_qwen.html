@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>互动桌面壁纸</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #99ff8e, #ff66cc);
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .desktop-wallpaper {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      background: url('https://via.placeholder.com/1080x800') no-repeat center/cover;
+      overflow: hidden;
+    }
+    .interactive-box {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100px;
+      height: 100px;
+      background: url('https://via.placeholder.com/200x100') no-repeat center;
+      transition: transform 0.5s ease;
+    }
+    .interactive-box:hover {
+      transform: translate(0, 0);
+    }
+  </style>
+</head>
+<body>
+  <div class="desktop-wallpaper"></div>
+  <div class="interactive-box"></div>
+  <script>
+    const box = document.querySelector('.interactive-box');
+    box.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      box.style.background = 'url(' + 'https://via.placeholder.com/200x100')';
+    });
+    box.addEventListener('dragleave', () => {
+      box.style.background = 'url(' + 'https://via.placeholder.com/200x100')';
+    });
+    box.addEventListener('click', () => {
+      box.style.background = 'url(' + 'https://via.placeholder.com/200x100')';
+    });
+  </script>
+</body>
+</html>

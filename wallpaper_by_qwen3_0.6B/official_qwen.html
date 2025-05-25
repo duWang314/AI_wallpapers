@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>炫酷互动桌面壁纸</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: url('https://example.com/desktop-background.jpg') no-repeat center center fixed;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    #interactive-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(135deg, #0078d5, #00c7d2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 1s;
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translate(0,100px); }
+      100% { opacity: 1; transform: translate(0,0); }
+    }
+    .interactive-element {
+      background: radial-gradient(circle, #0078d5, #00c7d2);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s;
+    }
+    .interactive-element:hover {
+      transform: scale(1.05);
+    }
+    .button {
+      background-color: #0078d5;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .button:hover {
+      background-color: #0055b7;
+    }
+  </style>
+</head>
+<body>
+  <div id="interactive-container">
+    <div class="interactive-element" onclick="toggleTheme()">切换主题</div>
+    <div class="interactive-element" onclick="toggleButton()">调整字体</div>
+    <div class="interactive-element" onclick="toggleEffect()">添加动画</div>
+  </div>
+
+  <script>
+    function toggleTheme() {
+      document.documentElement.classList.toggle("dark");
+    }
+
+    function toggleButton() {
+      document.querySelector(".button").classList.toggle("active");
+    }
+
+    function toggleEffect() {
+      document.querySelectorAll('.interactive-element').forEach(el => {
+        el.style.animation = 'fade-out 1s';
+      });
+    }
+  </script>
+</body>
+</html>
