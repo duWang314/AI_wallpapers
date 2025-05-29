@@ -1,0 +1,56 @@
+/* Neon Particle Wallpaper Styles */
+
+:root {
+    --glow-color: #00ffff;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #000;
+    font-family: 'Orbitron', sans-serif;
+}
+
+canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Let clicks pass through */
+}
+
+.title {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 5vw;
+    color: var(--glow-color);
+    letter-spacing: 0.25em;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    text-shadow: 0 0 8px var(--glow-color),
+                 0 0 16px var(--glow-color),
+                 0 0 32px var(--glow-color),
+                 0 0 64px var(--glow-color);
+    animation: pulse 6s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        text-shadow: 0 0 8px var(--glow-color),
+                     0 0 16px var(--glow-color),
+                     0 0 32px var(--glow-color),
+                     0 0 64px var(--glow-color);
+    }
+    50% {
+        text-shadow: 0 0 4px var(--glow-color),
+                     0 0 8px var(--glow-color),
+                     0 0 16px var(--glow-color),
+                     0 0 32px var(--glow-color);
+    }
+}

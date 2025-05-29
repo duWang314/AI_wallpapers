@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Neon Desktop Wallpaper</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
+    #canvas { display: block; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #0a0a0a, #000); }
+  </style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  <script>
+    (function() {
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+      let width = canvas.width = window.innerWidth;
+      let height = canvas.height = window.innerHeight;
+      const particles = [];
+      const colors = ['#0ff','#f0f','#ff0','#0f0','#00f','#f00'];
+      const maxParticles = 100;
+      function random(min, max) { return Math.random() * (max - min) + min; }
+      class Particle {
+        constructor() {
+          this.x = random(0, width);
+          this.y = random(0, height);
+          this.vx = random(-0.5, 0.5);
+          this.vy = random(-0.5, 0.5);
+          this.size = random(1, 3);
+          this.color = colors[Math.floor(random(0, colors.length))];
+        }
+        update() { this.x += this.vx; this.y += this.vy; if (this.x < 0 || this.x > width) this.vx *= -1; if (this.y < 0 || this.y > height) this.vy *= -1; }
+        draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fillStyle = this.color; ctx.shadowBlur = 10; ctx.shadowColor = this.color; ctx.fill(); }
+      }
+      function init() { for (let i = 0; i < maxParticles; i++) particles.push(new Particle()); }
+      function connect() { for (let i = 0; i < particles.length; i++) { for (let j = i + 1; j < particles.length; j++) { const dx = particles[i].x - particles[j].x; const dy = particles[i].y - particles[j].y; const dist = Math.hypot(dx, dy); if (dist < 100) { ctx.strokeStyle = particles[i].color; ctx.lineWidth = 0.5; ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke(); } } } }
+      function animate() { ctx.clearRect(0, 0, width, height); particles.forEach(p => { p.update(); p.draw(); }); connect(); requestAnimationFrame(animate); }
+      window.onresize = () => { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; };
+      canvas.addEventListener('mousemove', e => { for (let i = 0; i < 3; i++) { const p = new Particle(); p.x = e.clientX; p.y = e.clientY; particles.push(p); if (particles.length > maxParticles) particles.shift(); } });
+      init(); animate();
+    })();
+  </script>
+</body>
+</html>
