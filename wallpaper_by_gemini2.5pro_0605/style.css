@@ -1,0 +1,150 @@
+/* 全局样式和变量定义 */
+:root {
+    --primary-color: #00ffff; /* 青色 */
+    --secondary-color: #ff00ff; /* 品红色 */
+    --bg-color: #050a18; /* 深蓝背景 */
+    --text-glow: 0 0 5px var(--primary-color), 0 0 10px var(--primary-color), 0 0 20px var(--primary-color);
+    --mouse-x: 50%; /* 鼠标位置变量 */
+    --mouse-y: 50%; /* 鼠标位置变量 */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto Mono', monospace;
+    background-color: var(--bg-color);
+    color: var(--primary-color);
+    overflow: hidden; /* 隐藏滚动条 */
+    /* 核心互动效果：跟随鼠标的径向渐变背景 */
+    background-image: radial-gradient(
+        circle at var(--mouse-x) var(--mouse-y),
+        rgba(0, 255, 255, 0.15),
+        rgba(0, 0, 0, 0) 30%
+    );
+    transition: background 0.1s ease-out;
+}
+
+/* 数字雨 Canvas 背景 */
+#matrix-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0.5;
+}
+
+/* 主内容容器 */
+.desktop-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+    padding: 20px;
+    animation: fadeIn 2s ease-in-out;
+}
+
+/* 巨型时钟 */
+#clock {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 8vw; /* 响应式字体大小 */
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-shadow: var(--text-glow), 0 0 30px var(--secondary-color);
+    animation: glitch 5s infinite;
+}
+
+/* 欢迎信息 */
+.welcome-container {
+    margin-top: 20px;
+    height: 30px; /* 固定高度防止跳动 */
+}
+
+#welcome-text::after {
+    content: '_';
+    font-weight: bold;
+    animation: blink 1s step-end infinite;
+}
+
+/* 搜索终端 */
+.search-container {
+    margin-top: 40px;
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--primary-color);
+    padding: 10px 15px;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3) inset;
+    background: rgba(0, 25, 35, 0.5);
+    backdrop-filter: blur(5px);
+}
+
+.prompt {
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+#search-input {
+    background: transparent;
+    border: none;
+    color: var(--primary-color);
+    font-family: inherit;
+    font-size: 1em;
+    width: 300px;
+    outline: none;
+}
+
+#search-input::placeholder {
+    color: rgba(0, 255, 255, 0.5);
+}
+
+#search-btn {
+    background: transparent;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+    padding: 5px 10px;
+    margin-left: 10px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.3s, color 0.3s;
+}
+
+#search-btn:hover {
+    background: var(--primary-color);
+    color: var(--bg-color);
+    text-shadow: 0 0 5px var(--bg-color);
+}
+
+
+/* 动画效果 */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes blink {
+    from, to { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+/* 故障（Glitch）动画 */
+@keyframes glitch {
+  2%,64% {
+    transform: translate(2px,0) skew(0deg);
+  }
+  4%,60% {
+    transform: translate(-2px,0) skew(0deg);
+  }
+  62% {
+    transform: translate(0,0) skew(5deg); 
+  }
+  90% {
+      transform: none;
+  }
+}

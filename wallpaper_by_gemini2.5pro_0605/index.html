@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyberpunk Desktop</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto+Mono:wght@300&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 1. 数字雨背景 -->
+    <canvas id="matrix-bg"></canvas>
+
+    <!-- 2. 内容容器 -->
+    <div class="desktop-container">
+        
+        <!-- 3. 巨型时钟 -->
+        <div id="clock">00:00:00</div>
+
+        <!-- 4. 欢迎信息 -->
+        <div class="welcome-container">
+            <p id="welcome-text"></p>
+        </div>
+
+        <!-- 5. 搜索终端 -->
+        <div class="search-container">
+            <span class="prompt">></span>
+            <input type="text" id="search-input" placeholder="Search the web...">
+            <button id="search-btn">EXECUTE</button>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
