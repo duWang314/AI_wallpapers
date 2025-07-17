@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<title>Cyber Interactive Wallpaper</title>
+<style>
+    html,body{margin:0;height:100%;overflow:hidden;background:#000;cursor:none}
+    #cvs{position:absolute;top:0;left:0}
+    #info{position:absolute;bottom:10px;left:10px;font-family:'Courier New',monospace;color:#0ff;font-size:12px;text-shadow:0 0 5px #0ff}
+</style>
+</head>
+<body>
+<canvas id="cvs"></canvas>
+<div id="info">单击桌面 / 移动鼠标 体验互动</div>
+
+<script>
+/* ---------- 基础准备 ---------- */
+const cvs = document.getElementById('cvs');
+const ctx = cvs.getContext('2d');
+function resize(){cvs.width=window.innerWidth;cvs.height=window.innerHeight;}
+window.addEventListener('resize',resize);resize();
+
+/* ---------- 全局颜色表 ---------- */
+const neon=['#0ff','#f0f','#ff0','#0f0','#f00'];
+
+/* ---------- 粒子系统 ---------- */
+const particleCount = 120;
+const particles = [];
+class P{
+    constructor(x,y){
+        this.x=x;this.y=y;
+        this.r=Math.random()*2+1;
+        this.c=neon[Math.floor(Math.random()*neon.length)];
+        this.vx=(Math.random()-0.5)*0.3;
+        this.vy=(Math.random()-0.5)*0.3;
+        this.a=1;
+    }
+    update(mx,my){
+        const dx = mx - this.x;
+        const dy = my - this.y;
+        const dist = Math.sqrt(dx*dx+dy*dy);
+        if(dist<150){
+            this.x += dx*0.01;
+            this.y += dy*0.01;
+        }
+        this.x+=this.vx; this.y+=this.vy;
+        this.a*=0.99;
+    }
+    draw(){
+        ctx.globalAlpha=this.a;
+        ctx.fillStyle=this.c;
+        ctx.beginPath();
+        ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
+        ctx.fill();
+        ctx.globalAlpha=1;
+    }
+}
+function addParticles(x,y,n=3){
+    for(let i=0;i<n;i++) particles.push(new P(x,y));
+}
+for(let i=0;i<particleCount;i++) particles.push(new P(Math.random()*cvs.width,Math.random()*cvs.height));
+
+/* ---------- 扫描线背景 ---------- */
+let scanY = 0;
+function glitchScan(){
+    scanY = (scanY+2)%(cvs.height*2);
+    ctx.fillStyle='rgba(0,255,255,0.04)';
+    ctx.fillRect(0,scanY-2,cvs.width,2);
+    ctx.fillStyle='rgba(255,0,255,0.02)';
+    ctx.fillRect(0,scanY-4,cvs.width,4);
+}
+
+/* ---------- 闪电链 ---------- */
+const lightnings=[];
+class Lightning{
+    constructor(x,y){
+        this.points=[{x,y},{x:x+(Math.random()-0.5)*300,y:y+(Math.random()-0.5)*300}];
+        this.life=30;
+    }
+    update(){
+        this.life--;
+    }
+    draw(){
+        ctx.strokeStyle='#0ff';
+        ctx.lineWidth=2;
+        ctx.shadowBlur=10;
+        ctx.shadowColor='#0ff';
+        ctx.beginPath();
+        ctx.moveTo(this.points[0].x,this.points[0].y);
+        for(let i=1;i<this.points.length;i++) ctx.lineTo(this.points[i].x,this.points[i].y);
+        ctx.stroke();
+        ctx.shadowBlur=0;
+    }
+}
+
+/* ---------- 文字弹幕 ---------- */
+const msgs=['STAY FOXY','HACK THE PLANET','LOW-LEVEL REBORN'];
+const texts=[];
+class Text{
+    constructor(x,y){
+        this.x=x;this.y=y;
+        this.text=msgs[Math.floor(Math.random()*msgs.length)];
+        this.size=20;
+        this.a=1;
+    }
+    update(){
+        this.y-=1;
+        this.a-=0.01;
+    }
+    draw(){
+        ctx.globalAlpha=this.a;
+        ctx.fillStyle='#fff';
+        ctx.font=`${this.size}px monospace`;
+        ctx.fillText(this.text,this.x,this.y);
+        ctx.globalAlpha=1;
+    }
+}
+
+/* ---------- 鼠标监听 ---------- */
+let mx=cvs.width/2,my=cvs.height/2;
+window.addEventListener('mousemove',e=>{
+    mx=e.clientX;my=e.clientY;
+    addParticles(mx,my,1);
+});
+window.addEventListener('click',e=>{
+    lightnings.push(new Lightning(e.clientX,e.clientY));
+    texts.push(new Text(e.clientX,e.clientY));
+});
+
+/* ---------- 动画循环 ---------- */
+function animate(){
+    ctx.fillStyle='rgba(0,0,0,0.15)';
+    ctx.fillRect(0,0,cvs.width,cvs.height);
+    glitchScan();
+
+    particles.forEach((p,i)=>{
+        p.update(mx,my);
+        p.draw();
+        if(p.a<0.02) particles.splice(i,1);
+    });
+    lightnings.forEach((l,i)=>{
+        l.update();l.draw();
+        if(l.life<=0) lightnings.splice(i,1);
+    });
+    texts.forEach((t,i)=>{
+        t.update();t.draw();
+        if(t.a<=0) texts.splice(i,1);
+    });
+
+    requestAnimationFrame(animate);
+}
+animate();
+
+/* ---------- 失焦暂停 ---------- */
+document.addEventListener('visibilitychange',()=>{
+    if(document.hidden) return;
+    animate();
+});
+</script>
+</body>
+</html>
