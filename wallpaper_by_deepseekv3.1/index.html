@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>炫酷交互式星空壁纸</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+            background: #000;
+            color: white;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        .overlay {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .time {
+            font-size: 5rem;
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+        
+        .date {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0.8;
+        }
+        
+        .theme-selector {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .theme-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .theme-btn:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+        
+        .theme-btn.active {
+            transform: scale(1.2);
+            box-shadow: 0 0 15px white;
+            border: 2px solid white;
+        }
+        
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            transition: background 0.3s;
+        }
+        
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .instructions {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, #ff4d4d, #f9cb28, #4df9ff, #ff4d4d);
+            background-size: 300% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient 8s linear infinite;
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="starsCanvas"></canvas>
+    
+    <div class="overlay">
+        <h1>星空幻境</h1>
+        <div class="time" id="time">00:00:00</div>
+        <div class="date" id="date">2023年1月1日 星期一</div>
+        
+        <div class="theme-selector">
+            <div class="theme-btn active" style="background: linear-gradient(135deg, #4df9ff, #4d7cff);" data-theme="default"></div>
+            <div class="theme-btn" style="background: linear-gradient(135deg, #ff4d4d, #ff9a4d);" data-theme="sunset"></div>
+            <div class="theme-btn" style="background: linear-gradient(135deg, #9d4dff, #4d7cff);" data-theme="purple"></div>
+            <div class="theme-btn" style="background: linear-gradient(135deg, #4df9ff, #4dffb8);" data-theme="aqua"></div>
+            <div class="theme-btn" style="background: linear-gradient(135deg, #ff4dc6, #ff4d4d);" data-theme="pink"></div>
+        </div>
+    </div>
+    
+    <div class="controls">
+        <button class="control-btn" id="toggleParticles">粒子效果</button>
+        <button class="control-btn" id="toggleTrails">轨迹效果</button>
+    </div>
+    
+    <div class="instructions">
+        移动鼠标与粒子交互 | 点击切换主题
+    </div>
+
+    <script>
+        // 获取Canvas元素和上下文
+        const canvas = document.getElementById('starsCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // 设置Canvas尺寸为窗口大小
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        // 粒子数组
+        let particles = [];
+        // 鼠标位置
+        let mouse = {
+            x: null,
+            y: null,
+            radius: 100
+        };
+        
+        // 主题颜色配置
+        const themes = {
+            default: { particle: '#4df9ff', connection: '#4d7cff', background: 'rgba(0, 10, 20, 0.9)' },
+            sunset: { particle: '#ff9a4d', connection: '#ff4d4d', background: 'rgba(20, 5, 0, 0.9)' },
+            purple: { particle: '#9d4dff', connection: '#4d7cff', background: 'rgba(10, 0, 20, 0.9)' },
+            aqua: { particle: '#4df9ff', connection: '#4dffb8', background: 'rgba(0, 15, 10, 0.9)' },
+            pink: { particle: '#ff4dc6', connection: '#ff4d4d', background: 'rgba(20, 0, 10, 0.9)' }
+        };
+        
+        let currentTheme = 'default';
+        let showTrails = true;
+        let particlesEnabled = true;
+        
+        // 更新鼠标位置
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.x;
+            mouse.y = e.y;
+        });
+        
+        // 鼠标离开窗口时重置位置
+        window.addEventListener('mouseout', () => {
+            mouse.x = undefined;
+            mouse.y = undefined;
+        });
+        
+        // 窗口大小调整时重置Canvas尺寸
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            init(); // 重新初始化粒子
+        });
+        
+        // 粒子类
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 3 + 1;
+                this.speedX = Math.random() * 1 - 0.5;
+                this.speedY = Math.random() * 1 - 0.5;
+                this.color = themes[currentTheme].particle;
+            }
+            
+            // 更新粒子位置
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                
+                // 边界检查
+                if (this.x > canvas.width) this.x = 0;
+                else if (this.x < 0) this.x = canvas.width;
+                
+                if (this.y > canvas.height) this.y = 0;
+                else if (this.y < 0) this.y = canvas.height;
+                
+                // 鼠标交互
+                if (mouse.x !== undefined && mouse.y !== undefined) {
+                    const dx = mouse.x - this.x;
+                    const dy = mouse.y - this.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < mouse.radius) {
+                        // 粒子被鼠标排斥
+                        this.speedX -= dx / distance * 0.1;
+                        this.speedY -= dy / distance * 0.1;
+                    }
+                }
+                
+                // 限制速度
+                const speed = Math.sqrt(this.speedX * this.speedX + this.speedY * this.speedY);
+                if (speed > 2) {
+                    this.speedX = (this.speedX / speed) * 2;
+                    this.speedY = (this.speedY / speed) * 2;
+                }
+            }
+            
+            // 绘制粒子
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // 发光效果
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = this.color;
+            }
+        }
+        
+        // 初始化粒子
+        function init() {
+            particles = [];
+            const particleCount = Math.min(200, canvas.width * canvas.height / 1000);
+            
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+        
+        // 连接相近的粒子
+        function connectParticles() {
+            const maxDistance = 150;
+            for (let a = 0; a < particles.length; a++) {
+                for (let b = a; b < particles.length; b++) {
+                    const dx = particles[a].x - particles[b].x;
+                    const dy = particles[a].y - particles[b].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < maxDistance) {
+                        const opacity = 1 - distance / maxDistance;
+                        ctx.strokeStyle = `${themes[currentTheme].connection}${opacity.toFixed(2)})`;
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[a].x, particles[a].y);
+                        ctx.lineTo(particles[b].x, particles[b].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+        
+        // 动画循环
+        function animate() {
+            if (!showTrails) {
+                // 如果不显示轨迹，用半透明背景创建渐变消失效果
+                ctx.fillStyle = themes[currentTheme].background;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            } else {
+                // 如果显示轨迹，用完全透明清除画布
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+            
+            if (particlesEnabled) {
+                // 更新和绘制所有粒子
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+                }
+                
+                // 连接粒子
+                connectParticles();
+            }
+            
+            requestAnimationFrame(animate);
+        }
+        
+        // 初始化并开始动画
+        init();
+        animate();
+        
+        // 更新时间显示
+        function updateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('zh-CN');
+            const dateStr = now.toLocaleDateString('zh-CN', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                weekday: 'long'
+            });
+            
+            document.getElementById('time').textContent = timeStr;
+            document.getElementById('date').textContent = dateStr;
+        }
+        
+        // 初始更新时间并设置间隔
+        updateTime();
+        setInterval(updateTime, 1000);
+        
+        // 主题切换功能
+        document.querySelectorAll('.theme-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // 移除所有active类
+                document.querySelectorAll('.theme-btn').forEach(b => {
+                    b.classList.remove('active');
+                });
+                
+                // 添加active类到当前按钮
+                btn.classList.add('active');
+                
+                // 更新当前主题
+                currentTheme = btn.getAttribute('data-theme');
+                
+                // 更新所有粒子的颜色
+                particles.forEach(particle => {
+                    particle.color = themes[currentTheme].particle;
+                });
+            });
+        });
+        
+        // 控制按钮功能
+        document.getElementById('toggleParticles').addEventListener('click', function() {
+            particlesEnabled = !particlesEnabled;
+            this.textContent = particlesEnabled ? '粒子效果' : '粒子效果 (关)';
+        });
+        
+        document.getElementById('toggleTrails').addEventListener('click', function() {
+            showTrails = !showTrails;
+            this.textContent = showTrails ? '轨迹效果' : '轨迹效果 (关)';
+            
+            // 如果关闭轨迹，清除画布并填充背景
+            if (!showTrails) {
+                ctx.fillStyle = themes[currentTheme].background;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+        });
+    </script>
+</body>
+</html>
