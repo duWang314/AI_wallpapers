@@ -1,0 +1,4 @@
+/* 布什哥们，这小破网站有这玩意？ ^-^ */
+
+User-agent: *
+Disallow: /reading/
