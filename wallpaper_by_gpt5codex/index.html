@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Nexus Interactive Wallpaper</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <canvas id="starfield" aria-hidden="true"></canvas>
+
+    <div class="wallpaper">
+        <header class="hud">
+            <div class="hud__block time">
+                <h2>NeoTime</h2>
+                <span id="clock">--:--:--</span>
+                <small id="date">-- --</small>
+            </div>
+            <div class="hud__block battery">
+                <h2>Pulse</h2>
+                <div class="battery__bar">
+                    <div class="battery__level" id="batteryLevel"></div>
+                </div>
+                <small id="batteryText">Estimating...</small>
+            </div>
+            <div class="hud__block quote">
+                <h2>Ping</h2>
+                <p id="quote">Initializing signal...</p>
+            </div>
+        </header>
+
+        <main class="cityscape" role="presentation">
+            <div class="glow-orb glow-orb--left" aria-hidden="true"></div>
+            <div class="glow-orb glow-orb--right" aria-hidden="true"></div>
+            <div class="layer layer--far" data-depth="0.1"></div>
+            <div class="layer layer--mid" data-depth="0.3"></div>
+            <div class="layer layer--near" data-depth="0.6"></div>
+            <div class="horizon"></div>
+            <div class="grid"></div>
+        </main>
+
+        <aside class="control-panel" aria-label="互动面板">
+            <h2>调制场域</h2>
+            <div class="control">
+                <label for="accentColor">霓虹色彩</label>
+                <input type="color" id="accentColor" value="#00f6ff">
+            </div>
+            <div class="control">
+                <label for="parallaxRange">视差强度</label>
+                <input type="range" id="parallaxRange" min="0" max="100" value="60">
+            </div>
+            <div class="control toggle">
+                <label for="pulseToggle">能量脉冲</label>
+                <input type="checkbox" id="pulseToggle" checked>
+            </div>
+            <div class="control toggle">
+                <label for="noiseToggle">噪声覆层</label>
+                <input type="checkbox" id="noiseToggle" checked>
+            </div>
+            <div class="control">
+                <button id="randomQuote">刷新讯号</button>
+            </div>
+        </aside>
+    </div>
+
+    <div class="noise-overlay" id="noiseOverlay" aria-hidden="true"></div>
+
+    <script src="script.js" defer></script>
+</body>
+</html>
