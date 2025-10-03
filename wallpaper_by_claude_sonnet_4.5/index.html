@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>动态交互壁纸</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 动态渐变背景 -->
+    <div class="gradient-bg"></div>
+    
+    <!-- 粒子画布 -->
+    <canvas id="particleCanvas"></canvas>
+    
+    <!-- 时钟和信息显示 -->
+    <div class="info-container">
+        <div class="time-display">
+            <div class="time" id="time">00:00:00</div>
+            <div class="date" id="date">2025年10月3日</div>
+        </div>
+        
+        <div class="quote-container">
+            <p class="quote" id="quote">探索无限可能</p>
+        </div>
+    </div>
+    
+    <!-- 交互提示 -->
+    <div class="interaction-hint">
+        <p>🖱️ 移动鼠标探索 | 👆 点击创建涟漪效果</p>
+    </div>
+    
+    <!-- 装饰元素 -->
+    <div class="decorative-circles">
+        <div class="circle circle-1"></div>
+        <div class="circle circle-2"></div>
+        <div class="circle circle-3"></div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
