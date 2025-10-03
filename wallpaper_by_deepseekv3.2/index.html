@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>炫酷互动桌面壁纸</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            overflow: hidden;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #000;
+            color: #fff;
+            height: 100vh;
+            width: 100vw;
+            position: relative;
+        }
+        
+        #desktop {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        #particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        
+        .clock-container {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 2;
+        }
+        
+        .time {
+            font-size: 3.5rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        
+        .date {
+            font-size: 1.2rem;
+            text-align: center;
+            opacity: 0.8;
+        }
+        
+        .icon {
+            position: absolute;
+            width: 80px;
+            height: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s, filter 0.2s;
+            z-index: 2;
+        }
+        
+        .icon:hover {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+        }
+        
+        .icon img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            margin-bottom: 8px;
+        }
+        
+        .icon span {
+            color: white;
+            font-size: 12px;
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.4);
+            padding: 2px 6px;
+            border-radius: 4px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .dragging {
+            z-index: 1000;
+            opacity: 0.9;
+        }
+        
+        .theme-toggle {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 2;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .theme-toggle:hover {
+            background: rgba(0, 0, 0, 0.6);
+            transform: scale(1.05);
+        }
+        
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .floating-element {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            animation: float 15s infinite ease-in-out;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) rotate(0deg);
+                opacity: 0.6;
+            }
+            25% {
+                transform: translate(100px, 50px) rotate(90deg);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(50px, 100px) rotate(180deg);
+                opacity: 0.8;
+            }
+            75% {
+                transform: translate(-50px, 75px) rotate(270deg);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particles"></canvas>
+    
+    <div id="desktop">
+        <div class="clock-container">
+            <div class="time" id="time">00:00:00</div>
+            <div class="date" id="date">2023年1月1日 星期一</div>
+        </div>
+        
+        <div class="icon" style="top: 120px; left: 80px;" data-id="1">
+            <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjZmZmIiBkPSJNNDE2IDM4NGMwIDM1LjMtMjguNyA2NC02NCA2NEgxNjBjLTM1LjMgMC02NC0yOC43LTY0LTY0VjEyOGMwLTM1LjMgMjguNy02NCA2NC02NGgxOTJjMzUuMyAwIDY0IDI4LjcgNjQgNjRWMzg0eiIvPjxwYXRoIGZpbGw9IiMwMDAiIGQ9Ik0xNjAgOTZoMTkyYzE3LjcgMCAzMiAxNC4zIDMyIDMydjI1NkgxMjhWMTI4YzAtMTcuNyAxNC4zLTMyIDMyLTMyeiIvPjxwYXRoIGZpbGw9IiNmZmYiIGQ9Ik0zNTIgMTYwaDY0djE5Mmg2NFYxNjBjMC0xNy43LTE0LjMtMzItMzItMzJzLTMyIDE0LjMtMzIgMzJ6Ii8+PC9zdmc+" alt="文件夹">
+            <span>文档</span>
+        </div>
+        
+        <div class="icon" style="top: 250px; left: 80px;" data-id="2">
+            <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjZmZmIiBkPSJNNDY0IDQ0OEg0OEMyMS41IDQ0OCAwIDQyNi41IDAgNDAwVjExMmMwLTI2LjUgMjEuNS00OCA0OC00OGg0MTZjMjYuNSAwIDQ4IDIxLjUgNDggNDh2Mjg4YzAgMjYuNS0yMS41IDQ4LTQ4IDQ4eiIvPjxwYXRoIGZpbGw9IiMwMDAiIGQ9Ik00OCA4MGg0MTZjOC44IDAgMTYgNy4yIDE2IDE2djI4OGMwIDguOC03LjIgMTYtMTYgMTZINDhjLTguOCAwLTE2LTcuMi0xNi0xNlY5NmMwLTguOCA3LjItMTYgMTYtMTZ6Ii8+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTE0NCAyMjRoMjI0djY0SDE0NHYtNjR6bTAtOTZoMjI0djY0SDE0NHYtNjR6Ii8+PC9zdmc+" alt="浏览器">
+            <span>浏览器</span>
+        </div>
+        
+        <div class="icon" style="top: 380px; left: 80px;" data-id="3">
+            <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjZmZmIiBkPSJNNDQ4IDQ0OEg2NGMtMzUuMyAwLTY0LTI4LjctNjQtNjRWMTE2YzAtMzUuMyAyOC43LTY0IDY0LTY0aDM4NGMzNS4zIDAgNjQgMjguNyA2NCA2NHYyNjhjMCAzNS4zLTI4LjcgNjQtNjQgNjR6Ii8+PHBhdGggZmlsbD0iIzAwMCIgZD0iTTY0IDgwaDM4NGM4LjggMCAxNiA3LjIgMTYgMTZ2MjY4YzAgOC44LTcuMiAxNi0xNiAxNkg2NGMtOC44IDAtMTYtNy4yLTE2LTE2Vjk2YzAtOC44IDcuMi0xNiAxNi0xNnoiLz+8PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTE2MCAxNjBoMTkydjE5MkgxNjB6Ii8+PHBhdGggZmlsbD0iIzAwMCIgZD0iTTE5MiAyMjRoMTI4djY0SDE5MnYtNjR6bTAtOTZoMTI4djY0SDE5MnYtNjR6Ii8+PC9zdmc+" alt="音乐">
+            <span>音乐播放器</span>
+        </div>
+        
+        <div class="icon" style="top: 120px; left: 200px;" data-id="4">
+            <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjZmZmIiBkPSJNNDQ4IDk2SDE5MkMxNzIgOCAxMzYgMCA5NiAwQzQzIDAgMCA0MyAwIDk2czQzIDk2IDk2IDk2aDM1MnM2NCAwIDY0LTY0cy02NC02NC02NC02NHoiLz48cGF0aCBmaWxsPSIjMDAwIiBkPSJNNDQ4IDE2MEg5NkM0MyAxNjAgMCAyMDMgMCAyNjZzNDMgMTA2IDk2IDEwNmgzNTJzNjQgMCA2NC02NHMtNjQtNjQtNjQtNjR6Ii8+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTQ0OCAzMjBIMTkyYy0yMCA4OC01NiA5Ni05NiA5Ni00MyAwLTk2LTQzLTk2LTk2czQzLTk2IDk2LTk2aDM1MnM2NCAwIDY0IDY0cy02NCA2NC02NCA2NHoiLz48L3N2Zz4=" alt="设置">
+            <span>系统设置</span>
+        </div>
+        
+        <div class="theme-toggle" id="themeToggle">
+            切换主题
+        </div>
+        
+        <div class="floating-elements" id="floatingElements"></div>
+    </div>
+    
+    <script>
+        // 粒子系统
+        class ParticleSystem {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.particles = [];
+                this.colors = ['#ff3366', '#33ffcc', '#3366ff', '#ffcc33', '#cc33ff'];
+                this.resize();
+                this.init();
+                
+                window.addEventListener('resize', () => this.resize());
+            }
+            
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+            
+            init() {
+                const particleCount = Math.min(100, Math.floor(window.innerWidth * window.innerHeight / 10000));
+                
+                for (let i = 0; i < particleCount; i++) {
+                    this.particles.push({
+                        x: Math.random() * this.canvas.width,
+                        y: Math.random() * this.canvas.height,
+                        size: Math.random() * 3 + 1,
+                        speedX: (Math.random() - 0.5) * 0.5,
+                        speedY: (Math.random() - 0.5) * 0.5,
+                        color: this.colors[Math.floor(Math.random() * this.colors.length)],
+                        opacity: Math.random() * 0.5 + 0.2
+                    });
+                }
+            }
+            
+            update() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                for (let i = 0; i < this.particles.length; i++) {
+                    const p = this.particles[i];
+                    
+                    // 更新位置
+                    p.x += p.speedX;
+                    p.y += p.speedY;
+                    
+                    // 边界检查
+                    if (p.x < 0 || p.x > this.canvas.width) p.speedX *= -1;
+                    if (p.y < 0 || p.y > this.canvas.height) p.speedY *= -1;
+                    
+                    // 绘制粒子
+                    this.ctx.beginPath();
+                    this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    this.ctx.fillStyle = p.color;
+                    this.ctx.globalAlpha = p.opacity;
+                    this.ctx.fill();
+                    
+                    // 绘制粒子间的连线
+                    for (let j = i + 1; j < this.particles.length; j++) {
+                        const p2 = this.particles[j];
+                        const distance = Math.sqrt((p.x - p2.x) ** 2 + (p.y - p2.y) ** 2);
+                        
+                        if (distance < 100) {
+                            this.ctx.beginPath();
+                            this.ctx.moveTo(p.x, p.y);
+                            this.ctx.lineTo(p2.x, p2.y);
+                            this.ctx.strokeStyle = p.color;
+                            this.ctx.globalAlpha = (100 - distance) / 100 * 0.2;
+                            this.ctx.lineWidth = 0.5;
+                            this.ctx.stroke();
+                        }
+                    }
+                }
+                
+                this.ctx.globalAlpha = 1;
+                requestAnimationFrame(() => this.update());
+            }
+        }
+        
+        // 时钟功能
+        function updateClock() {
+            const now = new Date();
+            const timeElement = document.getElementById('time');
+            const dateElement = document.getElementById('date');
+            
+            // 格式化时间
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            timeElement.textContent = `${hours}:${minutes}:${seconds}`;
+            
+            // 格式化日期
+            const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+            dateElement.textContent = now.toLocaleDateString('zh-CN', options);
+        }
+        
+        // 图标拖拽功能
+        function initDraggableIcons() {
+            const icons = document.querySelectorAll('.icon');
+            let activeIcon = null;
+            let offsetX, offsetY;
+            
+            icons.forEach(icon => {
+                icon.addEventListener('mousedown', startDrag);
+                icon.addEventListener('touchstart', startDrag);
+            });
+            
+            function startDrag(e) {
+                activeIcon = this;
+                activeIcon.classList.add('dragging');
+                
+                const rect = activeIcon.getBoundingClientRect();
+                
+                if (e.type === 'mousedown') {
+                    offsetX = e.clientX - rect.left;
+                    offsetY = e.clientY - rect.top;
+                    document.addEventListener('mousemove', onDrag);
+                    document.addEventListener('mouseup', stopDrag);
+                } else {
+                    const touch = e.touches[0];
+                    offsetX = touch.clientX - rect.left;
+                    offsetY = touch.clientY - rect.top;
+                    document.addEventListener('touchmove', onDrag);
+                    document.addEventListener('touchend', stopDrag);
+                }
+                
+                e.preventDefault();
+            }
+            
+            function onDrag(e) {
+                if (!activeIcon) return;
+                
+                let clientX, clientY;
+                
+                if (e.type === 'mousemove') {
+                    clientX = e.clientX;
+                    clientY = e.clientY;
+                } else {
+                    clientX = e.touches[0].clientX;
+                    clientY = e.touches[0].clientY;
+                }
+                
+                // 计算新位置
+                const newX = clientX - offsetX;
+                const newY = clientY - offsetY;
+                
+                // 限制在可视区域内
+                const maxX = window.innerWidth - activeIcon.offsetWidth;
+                const maxY = window.innerHeight - activeIcon.offsetHeight;
+                
+                activeIcon.style.left = `${Math.max(0, Math.min(newX, maxX))}px`;
+                activeIcon.style.top = `${Math.max(0, Math.min(newY, maxY))}px`;
+            }
+            
+            function stopDrag() {
+                if (activeIcon) {
+                    activeIcon.classList.remove('dragging');
+                    activeIcon = null;
+                }
+                
+                document.removeEventListener('mousemove', onDrag);
+                document.removeEventListener('mouseup', stopDrag);
+                document.removeEventListener('touchmove', onDrag);
+                document.removeEventListener('touchend', stopDrag);
+            }
+        }
+        
+        // 创建浮动元素
+        function createFloatingElements() {
+            const container = document.getElementById('floatingElements');
+            const count = 15;
+            
+            for (let i = 0; i < count; i++) {
+                const element = document.createElement('div');
+                element.classList.add('floating-element');
+                
+                // 随机位置和大小
+                const size = Math.random() * 10 + 5;
+                element.style.width = `${size}px`;
+                element.style.height = `${size}px`;
+                element.style.left = `${Math.random() * 100}%`;
+                element.style.top = `${Math.random() * 100}%`;
+                
+                // 随机动画延迟
+                element.style.animationDelay = `${Math.random() * 15}s`;
+                
+                container.appendChild(element);
+            }
+        }
+        
+        // 主题切换
+        function initThemeToggle() {
+            const toggle = document.getElementById('themeToggle');
+            let isDark = true;
+            
+            toggle.addEventListener('click', () => {
+                isDark = !isDark;
+                
+                if (isDark) {
+                    document.body.style.background = '#000';
+                    document.querySelectorAll('.icon span').forEach(span => {
+                        span.style.background = 'rgba(0, 0, 0, 0.4)';
+                    });
+                } else {
+                    document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                    document.querySelectorAll('.icon span').forEach(span => {
+                        span.style.background = 'rgba(255, 255, 255, 0.4)';
+                        span.style.color = '#000';
+                    });
+                }
+            });
+        }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 初始化粒子系统
+            const canvas = document.getElementById('particles');
+            const particleSystem = new ParticleSystem(canvas);
+            particleSystem.update();
+            
+            // 初始化时钟
+            updateClock();
+            setInterval(updateClock, 1000);
+            
+            // 初始化图标拖拽
+            initDraggableIcons();
+            
+            // 创建浮动元素
+            createFloatingElements();
+            
+            // 初始化主题切换
+            initThemeToggle();
+        });
+    </script>
+</body>
+</html>
