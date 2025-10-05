@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Desktop - 互动桌面壁纸</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Orbitron', 'Courier New', monospace;
+            overflow: hidden;
+            background: #000;
+            cursor: none;
+            user-select: none;
+        }
+
+        /* 自定义字体 */
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+
+        /* 动态渐变背景 */
+        #gradient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #0a0e27, #1a0033, #0f172a, #1e1b4b);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            z-index: 1;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* 粒子画布 */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+        }
+
+        /* 网格背景 */
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: 3;
+            opacity: 0.3;
+            animation: gridMove 10s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        /* 自定义光标 */
+        .custom-cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #00ffff;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            transition: transform 0.1s;
+            box-shadow: 0 0 20px #00ffff, inset 0 0 10px #00ffff;
+        }
+
+        .cursor-trail {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(0, 255, 255, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.3s;
+        }
+
+        /* 主容器 */
+        .desktop-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            z-index: 10;
+        }
+
+        /* 顶部信息栏 */
+        .top-bar {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px 30px;
+            border-radius: 15px;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            animation: slideDown 1s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateX(-50%) translateY(-100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* 时钟 */
+        .clock {
+            font-size: 24px;
+            font-weight: 700;
+            color: #00ffff;
+            text-shadow: 0 0 10px #00ffff;
+            letter-spacing: 2px;
+        }
+
+        .date {
+            font-size: 14px;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        /* 系统监控 */
+        .system-monitor {
+            display: flex;
+            gap: 20px;
+        }
+
+        .monitor-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .monitor-label {
+            font-size: 10px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .monitor-value {
+            font-size: 18px;
+            color: #00ff88;
+            font-weight: 700;
+            margin-top: 5px;
+        }
+
+        .monitor-bar {
+            width: 60px;
+            height: 4px;
+            background: rgba(0, 255, 255, 0.2);
+            border-radius: 2px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+
+        .monitor-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ffff, #00ff88);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        /* 快捷方式 */
+        .shortcuts {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 30px;
+        }
+
+        .shortcut {
+            width: 80px;
+            height: 80px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shortcut::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #00ffff, #ff00ff, #00ff88, #00ffff);
+            border-radius: 15px;
+            opacity: 0;
+            z-index: -1;
+            transition: opacity 0.3s;
+            animation: rotate 3s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .shortcut:hover {
+            transform: translateY(-10px) scale(1.1);
+            border-color: #00ffff;
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.5);
+        }
+
+        .shortcut:hover::before {
+            opacity: 1;
+        }
+
+        .shortcut-icon {
+            font-size: 30px;
+            margin-bottom: 5px;
+        }
+
+        .shortcut-label {
+            font-size: 10px;
+            color: #00ffff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* 音频可视化 */
+        .audio-visualizer {
+            position: absolute;
+            bottom: 150px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 3px;
+            align-items: flex-end;
+            height: 100px;
+        }
+
+        .audio-bar {
+            width: 4px;
+            background: linear-gradient(to top, #00ffff, #ff00ff);
+            border-radius: 2px;
+            animation: audioWave 1s ease-in-out infinite;
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        @keyframes audioWave {
+            0%, 100% { height: 20px; }
+            50% { height: 100px; }
+        }
+
+        /* 天气卡片 */
+        .weather-card {
+            position: absolute;
+            top: 50%;
+            right: 50px;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            min-width: 200px;
+            animation: slideIn 1s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50%) translateX(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(-50%) translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .weather-icon {
+            font-size: 48px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .weather-temp {
+            font-size: 32px;
+            color: #00ffff;
+            text-align: center;
+            font-weight: 700;
+            text-shadow: 0 0 10px #00ffff;
+        }
+
+        .weather-desc {
+            font-size: 14px;
+            color: #888;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        /* 悬浮按钮 */
+        .floating-btn {
+            position: absolute;
+            top: 50%;
+            left: 50px;
+            transform: translateY(-50%);
+            width: 60px;
+            height: 60px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 255, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(0, 255, 255, 0.8); }
+        }
+
+        .floating-btn:hover {
+            transform: translateY(-50%) scale(1.2);
+            border-color: #00ffff;
+        }
+
+        .floating-btn-icon {
+            font-size: 24px;
+            color: #00ffff;
+        }
+
+        /* 提示信息 */
+        .tooltip {
+            position: fixed;
+            background: rgba(0, 0, 0, 0.9);
+            color: #00ffff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 12px;
+            pointer-events: none;
+            z-index: 10001;
+            opacity: 0;
+            transition: opacity 0.3s;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            backdrop-filter: blur(5px);
+        }
+
+        .tooltip.show {
+            opacity: 1;
+        }
+
+        /* 通知弹窗 */
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: -400px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 15px 20px;
+            min-width: 300px;
+            backdrop-filter: blur(10px);
+            transition: right 0.5s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            right: 20px;
+        }
+
+        .notification-title {
+            color: #00ffff;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .notification-message {
+            color: #888;
+            font-size: 14px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .top-bar {
+                flex-direction: column;
+                gap: 15px;
+                padding: 10px 20px;
+            }
+
+            .shortcuts {
+                gap: 15px;
+            }
+
+            .shortcut {
+                width: 60px;
+                height: 60px;
+            }
+
+            .weather-card {
+                right: 20px;
+                min-width: 150px;
+            }
+
+            .floating-btn {
+                left: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 动态渐变背景 -->
+    <div id="gradient-bg"></div>
+    
+    <!-- 网格覆盖层 -->
+    <div class="grid-overlay"></div>
+    
+    <!-- 粒子画布 -->
+    <canvas id="particle-canvas"></canvas>
+    
+    <!-- 自定义光标 -->
+    <div class="custom-cursor"></div>
+    <div class="cursor-trail"></div>
+    
+    <!-- 主桌面容器 -->
+    <div class="desktop-container">
+        <!-- 顶部信息栏 -->
+        <div class="top-bar">
+            <div class="clock-container">
+                <div class="clock" id="clock">00:00:00</div>
+                <div class="date" id="date">2025年10月5日</div>
+            </div>
+            
+            <div class="system-monitor">
+                <div class="monitor-item">
+                    <span class="monitor-label">CPU</span>
+                    <span class="monitor-value" id="cpu">45%</span>
+                    <div class="monitor-bar">
+                        <div class="monitor-fill" id="cpu-bar" style="width: 45%"></div>
+                    </div>
+                </div>
+                <div class="monitor-item">
+                    <span class="monitor-label">RAM</span>
+                    <span class="monitor-value" id="ram">62%</span>
+                    <div class="monitor-bar">
+                        <div class="monitor-fill" id="ram-bar" style="width: 62%"></div>
+                    </div>
+                </div>
+                <div class="monitor-item">
+                    <span class="monitor-label">GPU</span>
+                    <span class="monitor-value" id="gpu">38%</span>
+                    <div class="monitor-bar">
+                        <div class="monitor-fill" id="gpu-bar" style="width: 38%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 音频可视化 -->
+        <div class="audio-visualizer" id="audio-visualizer"></div>
+        
+        <!-- 快捷方式 -->
+        <div class="shortcuts">
+            <div class="shortcut" data-app="terminal">
+                <span class="shortcut-icon">💻</span>
+                <span class="shortcut-label">终端</span>
+            </div>
+            <div class="shortcut" data-app="browser">
+                <span class="shortcut-icon">🌐</span>
+                <span class="shortcut-label">浏览器</span>
+            </div>
+            <div class="shortcut" data-app="code">
+                <span class="shortcut-icon">⚡</span>
+                <span class="shortcut-label">代码</span>
+            </div>
+            <div class="shortcut" data-app="music">
+                <span class="shortcut-icon">🎵</span>
+                <span class="shortcut-label">音乐</span>
+            </div>
+            <div class="shortcut" data-app="files">
+                <span class="shortcut-icon">📁</span>
+                <span class="shortcut-label">文件</span>
+            </div>
+        </div>
+        
+        <!-- 天气卡片 -->
+        <div class="weather-card">
+            <div class="weather-icon">🌙</div>
+            <div class="weather-temp">22°C</div>
+            <div class="weather-desc">晴朗 · 北京</div>
+        </div>
+        
+        <!-- 悬浮按钮 -->
+        <div class="floating-btn" id="theme-btn">
+            <span class="floating-btn-icon">🎨</span>
+        </div>
+    </div>
+    
+    <!-- 提示信息 -->
+    <div class="tooltip" id="tooltip"></div>
+    
+    <!-- 通知弹窗 -->
+    <div class="notification" id="notification">
+        <div class="notification-title">系统通知</div>
+        <div class="notification-message">欢迎来到Cyber Desktop！</div>
+    </div>
+
+    <script>
+        // 粒子系统
+        class ParticleSystem {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.particles = [];
+                this.mouseX = 0;
+                this.mouseY = 0;
+                this.init();
+            }
+
+            init() {
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+                window.addEventListener('mousemove', (e) => {
+                    this.mouseX = e.clientX;
+                    this.mouseY = e.clientY;
+                });
+
+                // 创建粒子
+                for (let i = 0; i < 100; i++) {
+                    this.particles.push(this.createParticle());
+                }
+
+                this.animate();
+            }
+
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+
+            createParticle() {
+                return {
+                    x: Math.random() * this.canvas.width,
+                    y: Math.random() * this.canvas.height,
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: (Math.random() - 0.5) * 0.5,
+                    size: Math.random() * 2 + 1,
+                    color: `hsl(${180 + Math.random() * 60}, 100%, 50%)`
+                };
+            }
+
+            animate() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+                this.particles.forEach((particle, index) => {
+                    // 更新位置
+                    particle.x += particle.vx;
+                    particle.y += particle.vy;
+
+                    // 鼠标交互
+                    const dx = this.mouseX - particle.x;
+                    const dy = this.mouseY - particle.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < 100) {
+                        const force = (100 - distance) / 100;
+                        particle.vx -= (dx / distance) * force * 0.02;
+                        particle.vy -= (dy / distance) * force * 0.02;
+                    }
+
+                    // 边界检测
+                    if (particle.x < 0 || particle.x > this.canvas.width) particle.vx *= -1;
+                    if (particle.y < 0 || particle.y > this.canvas.height) particle.vy *= -1;
+
+                    // 绘制粒子
+                    this.ctx.beginPath();
+                    this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                    this.ctx.fillStyle = particle.color;
+                    this.ctx.fill();
+
+                    // 连线
+                    this.particles.slice(index + 1).forEach(otherParticle => {
+                        const dx = otherParticle.x - particle.x;
+                        const dy = otherParticle.y - particle.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance < 150) {
+                            this.ctx.beginPath();
+                            this.ctx.moveTo(particle.x, particle.y);
+                            this.ctx.lineTo(otherParticle.x, otherParticle.y);
+                            this.ctx.strokeStyle = `rgba(0, 255, 255, ${0.2 * (1 - distance / 150)})`;
+                            this.ctx.stroke();
+                        }
+                    });
+                });
+
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+
+        // 初始化粒子系统
+        const particleCanvas = document.getElementById('particle-canvas');
+        const particleSystem = new ParticleSystem(particleCanvas);
+
+        // 自定义光标
+        const cursor = document.querySelector('.custom-cursor');
+        const cursorTrail = document.querySelector('.cursor-trail');
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX - 10 + 'px';
+            cursor.style.top = e.clientY - 10 + 'px';
+            
+            setTimeout(() => {
+                cursorTrail.style.left = e.clientX - 20 + 'px';
+                cursorTrail.style.top = e.clientY - 20 + 'px';
+            }, 100);
+        });
+
+        // 时钟更新
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
+            
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            const day = now.getDate();
+            const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+            const weekday = weekdays[now.getDay()];
+            
+            document.getElementById('date').textContent = `${year}年${month}月${day}日${weekday}`;
+        }
+
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // 系统监控模拟
+        function updateSystemMonitor() {
+            const cpu = Math.floor(Math.random() * 30 + 30);
+            const ram = Math.floor(Math.random() * 20 + 50);
+            const gpu = Math.floor(Math.random() * 25 + 25);
+
+            document.getElementById('cpu').textContent = cpu + '%';
+            document.getElementById('cpu-bar').style.width = cpu + '%';
+            
+            document.getElementById('ram').textContent = ram + '%';
+            document.getElementById('ram-bar').style.width = ram + '%';
+            
+            document.getElementById('gpu').textContent = gpu + '%';
+            document.getElementById('gpu-bar').style.width = gpu + '%';
+        }
+
+        setInterval(updateSystemMonitor, 2000);
+        updateSystemMonitor();
+
+        // 音频可视化
+        function createAudioVisualizer() {
+            const visualizer = document.getElementById('audio-visualizer');
+            for (let i = 0; i < 30; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'audio-bar';
+                bar.style.animationDelay = `${i * 0.05}s`;
+                bar.style.animationDuration = `${0.5 + Math.random() * 0.5}s`;
+                visualizer.appendChild(bar);
+            }
+        }
+
+        createAudioVisualizer();
+
+        // 快捷方式交互
+        const shortcuts = document.querySelectorAll('.shortcut');
+        const tooltip = document.getElementById('tooltip');
+
+        shortcuts.forEach(shortcut => {
+            shortcut.addEventListener('mouseenter', (e) => {
+                const appName = e.currentTarget.dataset.app;
+                const appNames = {
+                    'terminal': '打开终端',
+                    'browser': '启动浏览器',
+                    'code': '代码编辑器',
+                    'music': '音乐播放器',
+                    'files': '文件管理器'
+                };
+                
+                tooltip.textContent = appNames[appName];
+                tooltip.style.left = e.pageX + 10 + 'px';
+                tooltip.style.top = e.pageY - 30 + 'px';
+                tooltip.classList.add('show');
+            });
+
+            shortcut.addEventListener('mouseleave', () => {
+                tooltip.classList.remove('show');
+            });
+
+            shortcut.addEventListener('click', (e) => {
+                const appName = e.currentTarget.dataset.app;
+                showNotification(`启动${appName}`, '正在加载应用程序...');
+                
+                // 添加点击动画
+                e.currentTarget.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    e.currentTarget.style.transform = '';
+                }, 200);
+            });
+        });
+
+        // 通知系统
+        function showNotification(title, message) {
+            const notification = document.getElementById('notification');
+            notification.querySelector('.notification-title').textContent = title;
+            notification.querySelector('.notification-message').textContent = message;
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // 主题切换
+        const themes = [
+            { bg: 'linear-gradient(45deg, #0a0e27, #1a0033, #0f172a, #1e1b4b)', color: '#00ffff' },
+            { bg: 'linear-gradient(45deg, #1a0033, #330011, #4a0e0e, #660033)', color: '#ff00ff' },
+            { bg: 'linear-gradient(45deg, #0d1117, #161b22, #21262d, #30363d)', color: '#00ff88' },
+            { bg: 'linear-gradient(45deg, #000428, #004e92, #009ffd, #00d2ff)', color: '#ffffff' }
+        ];
+
+        let currentTheme = 0;
+
+        document.getElementById('theme-btn').addEventListener('click', () => {
+            currentTheme = (currentTheme + 1) % themes.length;
+            const theme = themes[currentTheme];
+            
+            document.getElementById('gradient-bg').style.background = theme.bg;
+            document.documentElement.style.setProperty('--primary-color', theme.color);
+            
+            showNotification('主题切换', `已切换到主题 ${currentTheme + 1}`);
+        });
+
+        // 键盘快捷键
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 't' && e.ctrlKey) {
+                showNotification('快捷键', 'Ctrl+T 被按下');
+            }
+            
+            if (e.key === 'Escape') {
+                showNotification('系统', 'ESC 键被按下');
+            }
+        });
+
+        // 初始欢迎通知
+        setTimeout(() => {
+            showNotification('欢迎', '欢迎来到 Cyber Desktop！');
+        }, 1000);
+
+        // 随机天气更新
+        const weatherIcons = ['☀️', '⛅', '☁️', '🌙', '🌟'];
+        const weatherDescs = ['晴朗', '多云', '阴天', '夜晚', '星空'];
+        
+        setInterval(() => {
+            const randomIndex = Math.floor(Math.random() * weatherIcons.length);
+            const temp = Math.floor(Math.random() * 15 + 15);
+            
+            document.querySelector('.weather-icon').textContent = weatherIcons[randomIndex];
+            document.querySelector('.weather-temp').textContent = temp + '°C';
+            document.querySelector('.weather-desc').textContent = weatherDescs[randomIndex] + ' · 北京';
+        }, 30000);
+
+        // 页面加载动画
+        window.addEventListener('load', () => {
+            document.body.style.opacity = '0';
+            setTimeout(() => {
+                document.body.style.transition = 'opacity 1s';
+                document.body.style.opacity = '1';
+            }, 100);
+        });
+
+        // 双击切换全屏
+        document.addEventListener('dblclick', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+                showNotification('全屏模式', '已进入全屏模式');
+            } else {
+                document.exitFullscreen();
+                showNotification('窗口模式', '已退出全屏模式');
+            }
+        });
+    </script>
+</body>
+</html>
