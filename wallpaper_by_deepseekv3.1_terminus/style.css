@@ -1,0 +1,241 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden;
+    background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+    height: 100vh;
+    width: 100vw;
+    position: relative;
+}
+
+.wallpaper-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* 粒子画布 */
+#particleCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+/* 中央球体 */
+.central-orb {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+}
+
+.orb-core {
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle, #00ffff 0%, #0080ff 50%, transparent 70%);
+    border-radius: 50%;
+    box-shadow: 
+        0 0 60px #00ffff,
+        0 0 120px #0080ff,
+        inset 0 0 20px rgba(255, 255, 255, 0.3);
+    animation: pulse 4s ease-in-out infinite;
+}
+
+.orb-rings {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.ring {
+    position: absolute;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    animation: rotate 6s linear infinite;
+}
+
+.ring-1 {
+    width: 200px;
+    height: 200px;
+    border-top-color: #ff6b6b;
+    animation-duration: 8s;
+    animation-delay: 0s;
+}
+
+.ring-2 {
+    width: 280px;
+    height: 280px;
+    border-right-color: #4ecdc4;
+    animation-duration: 10s;
+    animation-delay: -2s;
+}
+
+.ring-3 {
+    width: 360px;
+    height: 360px;
+    border-bottom-color: #45b7d1;
+    animation-duration: 12s;
+    animation-delay: -4s;
+}
+
+/* 信息面板 */
+.info-panel {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 3;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.time-display {
+    font-size: 2.5em;
+    font-weight: 300;
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+    margin-bottom: 10px;
+}
+
+.date-display {
+    font-size: 1.2em;
+    color: #cccccc;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+/* 控制面板 */
+.control-panel {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    display: flex;
+    gap: 15px;
+}
+
+.control-btn {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.control-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.control-btn:active {
+    transform: translateY(0);
+}
+
+/* 动画 */
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 
+            0 0 60px #00ffff,
+            0 0 120px #0080ff,
+            inset 0 0 20px rgba(255, 255, 255, 0.3);
+    }
+    50% {
+        transform: scale(1.1);
+        box-shadow: 
+            0 0 80px #00ffff,
+            0 0 160px #0080ff,
+            inset 0 0 30px rgba(255, 255, 255, 0.5);
+    }
+}
+
+@keyframes rotate {
+    0% {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+    100% {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+/* 鼠标交互效果 */
+.central-orb:hover .orb-core {
+    animation: pulse 1s ease-in-out infinite;
+    background: radial-gradient(circle, #ff6b6b 0%, #ff0080 50%, transparent 70%);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .orb-core {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .ring-1 { width: 150px; height: 150px; }
+    .ring-2 { width: 210px; height: 210px; }
+    .ring-3 { width: 270px; height: 270px; }
+    
+    .time-display { font-size: 2em; }
+    .date-display { font-size: 1em; }
+    
+    .control-panel {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+/* 暗色主题 */
+body.dark-theme {
+    background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #2d2d2d 100%);
+}
+
+body.dark-theme .orb-core {
+    background: radial-gradient(circle, #ff6b6b 0%, #ff0080 50%, transparent 70%);
+    box-shadow: 
+        0 0 60px #ff6b6b,
+        0 0 120px #ff0080,
+        inset 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+/* 明亮主题 */
+body.light-theme {
+    background: linear-gradient(135deg, #87CEEB 0%, #98FB98 50%, #FFB6C1 100%);
+}
+
+body.light-theme .orb-core {
+    background: radial-gradient(circle, #ffff00 0%, #ffa500 50%, transparent 70%);
+    box-shadow: 
+        0 0 60px #ffff00,
+        0 0 120px #ffa500,
+        inset 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+body.light-theme .info-panel,
+body.light-theme .control-btn {
+    background: rgba(255, 255, 255, 0.3);
+    color: #333;
+}
+
+body.light-theme .time-display,
+body.light-theme .date-display {
+    color: #333;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
