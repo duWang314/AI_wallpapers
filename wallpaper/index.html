@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>炫彩交互壁纸</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 星域背景 -->
+    <div class="starfield"></div>
+    
+    <!-- 动态网格背景 -->
+    <div class="grid-background"></div>
+    
+    <!-- 浮动粒子 -->
+    <div class="particles" id="particles"></div>
+    
+    <!-- 中心主体 -->
+    <div class="main-container">
+        <!-- 响应式圆环 -->
+        <div class="orbital-rings">
+            <div class="ring ring-1"></div>
+            <div class="ring ring-2"></div>
+            <div class="ring ring-3"></div>
+        </div>
+        
+        <!-- 中心球体 -->
+        <div class="center-sphere">
+            <div class="sphere-inner"></div>
+            <div class="sphere-glow"></div>
+        </div>
+        
+        <!-- 浮动卡片 -->
+        <div class="floating-cards">
+            <div class="card card-1">
+                <div class="card-icon">◆</div>
+                <div class="card-text">创意</div>
+            </div>
+            <div class="card card-2">
+                <div class="card-icon">✦</div>
+                <div class="card-text">动态</div>
+            </div>
+            <div class="card card-3">
+                <div class="card-icon">◈</div>
+                <div class="card-text">互动</div>
+            </div>
+            <div class="card card-4">
+                <div class="card-icon">✧</div>
+                <div class="card-text">未来</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 时间与信息面板 -->
+    <div class="info-panel">
+        <div class="time" id="time">00:00:00</div>
+        <div class="date" id="date">2025-10-16</div>
+    </div>
+    
+    <!-- 交互控制面板 -->
+    <div class="control-panel">
+        <button class="control-btn" id="toggleTheme" title="切换主题">🎨</button>
+        <button class="control-btn" id="toggleSound" title="切换音效">🔊</button>
+        <button class="control-btn" id="toggleParticles" title="切换粒子">✨</button>
+        <button class="control-btn" id="toggleMusic" title="切换背景音乐">🎵</button>
+    </div>
+    
+    <!-- 交互提示 -->
+    <div class="interact-hint">
+        <p>💡 鼠标移动创意轨迹 | 点击中心激活能量 | 按键盘切换效果</p>
+    </div>
+    
+    <!-- 音频元素 -->
+    <audio id="bgMusic" loop>
+        <source src="data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQIAAAAAAA==" type="audio/wav">
+    </audio>
+    
+    <script src="script.js"></script>
+</body>
+</html>

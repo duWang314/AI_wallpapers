@@ -1,0 +1,541 @@
+/* ==================== 全局样式 ==================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: #0a0e27;
+    color: #fff;
+    cursor: crosshair;
+    position: relative;
+}
+
+/* ==================== 主题切换 ==================== */
+body.theme-dark {
+    background: #0a0e27;
+    --primary-color: #00d4ff;
+    --secondary-color: #ff006e;
+    --accent-color: #8338ec;
+}
+
+body.theme-cyber {
+    background: #0d0221;
+    --primary-color: #3a86ff;
+    --secondary-color: #fb5607;
+    --accent-color: #ffbe0b;
+}
+
+body.theme-neon {
+    background: #001a33;
+    --primary-color: #00ff88;
+    --secondary-color: #ff006e;
+    --accent-color: #00d9ff;
+}
+
+body.theme-sunset {
+    background: #0f0a1f;
+    --primary-color: #ff6b35;
+    --secondary-color: #f7b801;
+    --accent-color: #ff006e;
+}
+
+:root {
+    --primary-color: #00d4ff;
+    --secondary-color: #ff006e;
+    --accent-color: #8338ec;
+    --text-color: #ffffff;
+    --bg-color: #0a0e27;
+}
+
+/* ==================== 背景效果 ==================== */
+.starfield {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse at 50% 50%, rgba(0, 212, 255, 0.03), transparent 50%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.starfield::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(2px 2px at 20px 30px, rgba(0, 212, 255, 0.8), rgba(0, 212, 255, 0)),
+        radial-gradient(2px 2px at 60px 70px, rgba(255, 0, 110, 0.8), rgba(255, 0, 110, 0)),
+        radial-gradient(1px 1px at 50px 50px, rgba(131, 56, 236, 0.8), rgba(131, 56, 236, 0));
+    background-size: 200px 200px;
+    animation: twinkling 5s infinite;
+}
+
+@keyframes twinkling {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+.grid-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(0deg, rgba(0, 212, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 212, 255, 0.05) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+    z-index: 1;
+    animation: gridScroll 20s linear infinite;
+}
+
+@keyframes gridScroll {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 50px 50px;
+    }
+}
+
+/* ==================== 粒子效果 ==================== */
+.particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--primary-color);
+}
+
+/* ==================== 主容器 ==================== */
+.main-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 500px;
+    height: 500px;
+    z-index: 10;
+}
+
+/* ==================== 轨道圆环 ==================== */
+.orbital-rings {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+}
+
+.ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 2px solid;
+    border-radius: 50%;
+    animation: rotate linear infinite;
+}
+
+.ring-1 {
+    width: 400px;
+    height: 400px;
+    border-color: rgba(0, 212, 255, 0.3);
+    animation-duration: 10s;
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.2), inset 0 0 20px rgba(0, 212, 255, 0.1);
+}
+
+.ring-2 {
+    width: 300px;
+    height: 300px;
+    border-color: rgba(255, 0, 110, 0.3);
+    animation-duration: -15s;
+    box-shadow: 0 0 15px rgba(255, 0, 110, 0.2), inset 0 0 15px rgba(255, 0, 110, 0.1);
+}
+
+.ring-3 {
+    width: 200px;
+    height: 200px;
+    border-color: rgba(131, 56, 236, 0.3);
+    animation-duration: 12s;
+    box-shadow: 0 0 10px rgba(131, 56, 236, 0.2), inset 0 0 10px rgba(131, 56, 236, 0.1);
+}
+
+@keyframes rotate {
+    from {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+    to {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+/* ==================== 中心球体 ==================== */
+.center-sphere {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px;
+    height: 100px;
+    z-index: 15;
+}
+
+.sphere-inner {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 30% 30%, rgba(0, 212, 255, 0.8), rgba(131, 56, 236, 0.4));
+    border-radius: 50%;
+    box-shadow: 
+        0 0 30px rgba(0, 212, 255, 0.6),
+        0 0 60px rgba(131, 56, 236, 0.4),
+        inset -20px -20px 40px rgba(0, 0, 0, 0.5);
+    animation: pulseGlow 2s ease-in-out infinite;
+}
+
+.sphere-glow {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(0, 212, 255, 0.1), transparent);
+    border-radius: 50%;
+    box-shadow: 0 0 80px 20px rgba(0, 212, 255, 0.3);
+    animation: expandGlow 2s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+    0%, 100% {
+        box-shadow: 
+            0 0 30px rgba(0, 212, 255, 0.6),
+            0 0 60px rgba(131, 56, 236, 0.4),
+            inset -20px -20px 40px rgba(0, 0, 0, 0.5);
+    }
+    50% {
+        box-shadow: 
+            0 0 50px rgba(0, 212, 255, 0.8),
+            0 0 100px rgba(131, 56, 236, 0.6),
+            inset -20px -20px 40px rgba(0, 0, 0, 0.5);
+    }
+}
+
+@keyframes expandGlow {
+    0%, 100% {
+        box-shadow: 0 0 80px 20px rgba(0, 212, 255, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 120px 40px rgba(0, 212, 255, 0.2);
+    }
+}
+
+.center-sphere:hover .sphere-inner {
+    animation: pulseGlowHover 1s ease-in-out infinite;
+}
+
+@keyframes pulseGlowHover {
+    0%, 100% {
+        box-shadow: 
+            0 0 40px rgba(255, 0, 110, 0.8),
+            0 0 80px rgba(0, 212, 255, 0.6),
+            inset -20px -20px 40px rgba(0, 0, 0, 0.5);
+    }
+    50% {
+        box-shadow: 
+            0 0 60px rgba(255, 0, 110, 1),
+            0 0 120px rgba(0, 212, 255, 0.8),
+            inset -20px -20px 40px rgba(0, 0, 0, 0.5);
+    }
+}
+
+/* ==================== 浮动卡片 ==================== */
+.floating-cards {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+}
+
+.card {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    animation: floating 3s ease-in-out infinite;
+}
+
+.card:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: scale(1.1) !important;
+    box-shadow: 0 0 30px currentColor;
+}
+
+.card-icon {
+    font-size: 32px;
+    margin-bottom: 5px;
+    transition: all 0.3s ease;
+}
+
+.card-text {
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.card-1 {
+    top: -120px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-color: rgba(0, 212, 255, 0.6);
+    color: #00d4ff;
+    animation: floating 3s ease-in-out infinite;
+}
+
+.card-2 {
+    top: 50%;
+    right: -120px;
+    transform: translateY(-50%);
+    border-color: rgba(255, 0, 110, 0.6);
+    color: #ff006e;
+    animation: floating 3.5s ease-in-out infinite 0.3s;
+}
+
+.card-3 {
+    bottom: -120px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-color: rgba(131, 56, 236, 0.6);
+    color: #8338ec;
+    animation: floating 3s ease-in-out infinite 0.6s;
+}
+
+.card-4 {
+    top: 50%;
+    left: -120px;
+    transform: translateY(-50%);
+    border-color: rgba(255, 193, 7, 0.6);
+    color: #ffc107;
+    animation: floating 3.5s ease-in-out infinite 0.9s;
+}
+
+@keyframes floating {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+/* ==================== 时间与日期面板 ==================== */
+.info-panel {
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(0, 212, 255, 0.5);
+    border-radius: 15px;
+    padding: 20px 30px;
+    backdrop-filter: blur(10px);
+    z-index: 20;
+    text-align: right;
+    box-shadow: 0 0 30px rgba(0, 212, 255, 0.2);
+}
+
+.time {
+    font-size: 32px;
+    font-weight: bold;
+    font-family: 'Courier New', monospace;
+    margin-bottom: 10px;
+    color: #00d4ff;
+    text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+}
+
+.date {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* ==================== 控制面板 ==================== */
+.control-panel {
+    position: fixed;
+    top: 40px;
+    right: 40px;
+    display: flex;
+    gap: 15px;
+    z-index: 20;
+}
+
+.control-btn {
+    width: 50px;
+    height: 50px;
+    border: 2px solid rgba(0, 212, 255, 0.5);
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
+}
+
+.control-btn:hover {
+    background: rgba(0, 212, 255, 0.1);
+    border-color: rgba(0, 212, 255, 0.8);
+    box-shadow: 0 0 30px rgba(0, 212, 255, 0.4);
+    transform: scale(1.1);
+}
+
+.control-btn:active {
+    transform: scale(0.95);
+}
+
+/* ==================== 交互提示 ==================== */
+.interact-hint {
+    position: fixed;
+    top: 40px;
+    left: 40px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 13px;
+    z-index: 20;
+    transition: all 0.3s ease;
+}
+
+.interact-hint:hover {
+    color: rgba(0, 212, 255, 0.9);
+}
+
+/* ==================== 鼠标跟踪轨迹 ==================== */
+.mouse-trail {
+    position: fixed;
+    pointer-events: none;
+    z-index: 5;
+    font-size: 20px;
+    animation: trailFade 0.8s ease-out forwards;
+}
+
+@keyframes trailFade {
+    from {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0);
+    }
+}
+
+/* ==================== 点击涟漪效果 ==================== */
+.ripple {
+    position: fixed;
+    pointer-events: none;
+    border: 2px solid rgba(0, 212, 255, 0.8);
+    border-radius: 50%;
+    animation: rippleEffect 0.8s ease-out;
+}
+
+@keyframes rippleEffect {
+    from {
+        width: 20px;
+        height: 20px;
+        opacity: 1;
+    }
+    to {
+        width: 200px;
+        height: 200px;
+        opacity: 0;
+    }
+}
+
+/* ==================== 响应式设计 ==================== */
+@media (max-width: 768px) {
+    .main-container {
+        width: 300px;
+        height: 300px;
+    }
+    
+    .ring-1 {
+        width: 250px;
+        height: 250px;
+    }
+    
+    .ring-2 {
+        width: 180px;
+        height: 180px;
+    }
+    
+    .ring-3 {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .center-sphere {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .card {
+        width: 60px;
+        height: 60px;
+        font-size: 24px;
+    }
+    
+    .info-panel {
+        bottom: 20px;
+        right: 20px;
+        padding: 15px 20px;
+    }
+    
+    .time {
+        font-size: 24px;
+    }
+    
+    .date {
+        font-size: 12px;
+    }
+    
+    .control-panel {
+        top: 20px;
+        right: 20px;
+    }
+    
+    .interact-hint {
+        top: 20px;
+        left: 20px;
+        font-size: 11px;
+    }
+}
