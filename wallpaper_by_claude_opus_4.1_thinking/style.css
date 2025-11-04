@@ -1,0 +1,326 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    cursor: none;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: #0a0a0a;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    position: relative;
+}
+
+/* 渐变背景 */
+.gradient-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, #1a0033, #330066, #4d0099, #6600cc);
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+    opacity: 0.6;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* 粒子画布 */
+#particleCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+/* 主容器 */
+.container {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: white;
+    pointer-events: none;
+}
+
+/* 时钟样式 */
+.clock-container {
+    margin-bottom: 60px;
+    text-align: center;
+    animation: fadeInUp 1s ease;
+}
+
+.digital-clock {
+    font-size: 120px;
+    font-weight: 100;
+    letter-spacing: 10px;
+    text-shadow: 
+        0 0 10px rgba(255, 255, 255, 0.5),
+        0 0 20px rgba(255, 255, 255, 0.3),
+        0 0 30px rgba(255, 255, 255, 0.2),
+        0 0 40px #00ffff,
+        0 0 70px #00ffff,
+        0 0 80px #00ffff,
+        0 0 100px #00ffff;
+    font-family: 'Courier New', monospace;
+}
+
+.separator {
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+.date {
+    margin-top: 20px;
+    font-size: 24px;
+    opacity: 0.8;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+/* 欢迎文字 */
+.welcome-text {
+    text-align: center;
+    animation: fadeInUp 1.5s ease;
+}
+
+.glitch {
+    font-size: 80px;
+    font-weight: bold;
+    text-transform: uppercase;
+    position: relative;
+    color: #ffffff;
+    letter-spacing: 5px;
+    animation: glitch 2s linear infinite;
+    text-shadow: 
+        0 0 10px #00ffff,
+        0 0 20px #00ffff,
+        0 0 30px #00ffff,
+        0 0 40px #00ffff;
+}
+
+@keyframes glitch {
+    2%, 64% {
+        transform: translate(2px, 0) skew(0deg);
+    }
+    4%, 60% {
+        transform: translate(-2px, 0) skew(0deg);
+    }
+    62% {
+        transform: translate(0, 0) skew(5deg);
+    }
+}
+
+.glitch:before,
+.glitch:after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.glitch:before {
+    animation: glitchTop 1s linear infinite;
+    clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
+    color: #ff00ff;
+}
+
+.glitch:after {
+    animation: glitchBottom 1.5s linear infinite;
+    clip-path: polygon(0 67%, 100% 67%, 100% 100%, 0 100%);
+    color: #00ffff;
+}
+
+@keyframes glitchTop {
+    2%, 64% {
+        transform: translate(2px, -2px);
+    }
+    4%, 60% {
+        transform: translate(-2px, 2px);
+    }
+    62% {
+        transform: translate(13px, -1px) skew(-13deg);
+    }
+}
+
+@keyframes glitchBottom {
+    2%, 64% {
+        transform: translate(-2px, 0);
+    }
+    4%, 60% {
+        transform: translate(-2px, 0);
+    }
+    62% {
+        transform: translate(-22px, 5px) skew(21deg);
+    }
+}
+
+.subtitle {
+    margin-top: 20px;
+    font-size: 20px;
+    opacity: 0.7;
+    letter-spacing: 5px;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+}
+
+/* 提示文字 */
+.hint {
+    position: absolute;
+    bottom: 50px;
+    text-align: center;
+    animation: fadeIn 2s ease;
+}
+
+.hint p {
+    font-size: 16px;
+    opacity: 0.5;
+    letter-spacing: 2px;
+    transition: opacity 0.3s ease;
+}
+
+.hint p:hover {
+    opacity: 0.8;
+}
+
+/* 鼠标跟随效果 */
+.cursor-follower {
+    position: fixed;
+    width: 40px;
+    height: 40px;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    pointer-events: none;
+    transition: transform 0.1s ease;
+    z-index: 9999;
+    mix-blend-mode: difference;
+}
+
+.cursor-dot {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 10000;
+    mix-blend-mode: difference;
+}
+
+/* 涟漪效果 */
+.ripple {
+    position: fixed;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: rippleEffect 1s ease-out forwards;
+    pointer-events: none;
+    z-index: 5;
+}
+
+@keyframes rippleEffect {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 1;
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+    }
+    100% {
+        width: 300px;
+        height: 300px;
+        opacity: 0;
+        box-shadow: 0 0 50px rgba(0, 255, 255, 0);
+    }
+}
+
+/* 动画 */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 主题切换类 */
+body.light-theme {
+    background: #f0f0f0;
+}
+
+body.light-theme .gradient-bg {
+    background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+    opacity: 0.3;
+}
+
+body.light-theme .digital-clock,
+body.light-theme .date,
+body.light-theme .glitch,
+body.light-theme .subtitle,
+body.light-theme .hint p {
+    color: #333;
+    text-shadow: 
+        0 0 10px rgba(0, 0, 0, 0.1),
+        0 0 20px rgba(0, 0, 0, 0.05);
+}
+
+body.light-theme .cursor-follower,
+body.light-theme .cursor-dot {
+    border-color: #333;
+    background: #333;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .digital-clock {
+        font-size: 60px;
+        letter-spacing: 5px;
+    }
+    
+    .glitch {
+        font-size: 40px;
+    }
+    
+    .date {
+        font-size: 18px;
+    }
+    
+    .subtitle {
+        font-size: 16px;
+    }
+    
+    .hint p {
+        font-size: 14px;
+    }
+}
