@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>炫酷互动桌面壁纸</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            overflow: hidden;
+            position: relative;
+            height: 100vh;
+        }
+
+        /* 背景网格效果 */
+        .grid-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        /* 时间显示 */
+        .time-display {
+            position: absolute;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #e0f7fa;
+            font-size: 4rem;
+            font-weight: 300;
+            text-shadow: 0 0 15px rgba(0, 255, 255, 0.7);
+            z-index: 10;
+            transition: all 0.3s ease;
+            letter-spacing: 2px;
+        }
+
+        .date-display {
+            position: absolute;
+            top: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #bbdefb;
+            font-size: 1.2rem;
+            font-weight: 300;
+            z-index: 10;
+        }
+
+        /* 粒子效果容器 */
+        #particles-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+        }
+
+        /* 鼠标指针效果 */
+        .cursor-effect {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border: 2px solid rgba(0, 255, 255, 0.8);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 15;
+            transition: all 0.1s ease;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+        }
+
+        .cursor-trail {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: rgba(0, 255, 255, 0.9);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 14;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 1);
+        }
+
+        /* 浮动几何图形 */
+        .floating-shape {
+            position: absolute;
+            opacity: 0.15;
+            animation: float 15s infinite ease-in-out;
+            filter: blur(1px);
+        }
+
+        .triangle {
+            width: 0;
+            height: 0;
+            border-left: 40px solid transparent;
+            border-right: 40px solid transparent;
+            border-bottom: 70px solid #00bcd4;
+        }
+
+        .circle {
+            width: 60px;
+            height: 60px;
+            background: #e1f5fe;
+            border-radius: 50%;
+        }
+
+        .square {
+            width: 50px;
+            height: 50px;
+            background: #18ffff;
+            transform: rotate(45deg);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            33% { transform: translateY(-30px) rotate(120deg); }
+            66% { transform: translateY(30px) rotate(240deg); }
+        }
+
+        /* 交互提示 */
+        .interaction-hint {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1rem;
+            text-align: center;
+            z-index: 10;
+            font-weight: 300;
+        }
+
+        /* 点击波纹效果 */
+        .ripple {
+            position: absolute;
+            border: 2px solid #00e5ff;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            animation: rippleEffect 1.2s ease-out;
+        }
+
+        @keyframes rippleEffect {
+            0% {
+                width: 0;
+                height: 0;
+                opacity: 1;
+            }
+            100% {
+                width: 400px;
+                height: 400px;
+                opacity: 0;
+            }
+        }
+
+        /* 科技感光效 */
+        .laser-line {
+            position: absolute;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #00e5ff, transparent);
+            animation: laserMove 8s linear infinite;
+            filter: blur(1px);
+        }
+
+        @keyframes laserMove {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100vw); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景网格 -->
+    <div class="grid-bg"></div>
+
+    <!-- 激光线效果 -->
+    <div class="laser-line" style="top: 20%;"></div>
+    <div class="laser-line" style="top: 50%; animation-delay: 3s;"></div>
+    <div class="laser-line" style="top: 80%; animation-delay: 5s;"></div>
+
+    <!-- 时间显示 -->
+    <div class="time-display" id="timeDisplay">00:00:00</div>
+    <div class="date-display" id="dateDisplay">2024年1月1日 星期一</div>
+
+    <!-- 粒子画布 -->
+    <canvas id="particles-canvas"></canvas>
+
+    <!-- 鼠标效果 -->
+    <div class="cursor-effect" id="cursorEffect"></div>
+
+    <!-- 浮动几何图形 -->
+    <div class="floating-shape triangle" style="top: 15%; left: 10%; animation-delay: 0s;"></div>
+    <div class="floating-shape circle" style="top: 70%; left: 80%; animation-delay: 2s;"></div>
+    <div class="floating-shape square" style="top: 40%; left: 15%; animation-delay: 4s;"></div>
+    <div class="floating-shape triangle" style="top: 60%; left: 70%; animation-delay: 6s;"></div>
+    <div class="floating-shape circle" style="top: 25%; left: 85%; animation-delay: 8s;"></div>
+
+    <!-- 交互提示 -->
+    <div class="interaction-hint">
+        移动鼠标查看粒子效果 | 点击创造波纹 | 享受你的炫酷桌面
+    </div>
+
+    <script>
+        // 时间显示更新
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('zh-CN', { hour12: false });
+            const dateString = now.toLocaleDateString('zh-CN', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric', 
+                weekday: 'long' 
+            });
+            
+            document.getElementById('timeDisplay').textContent = timeString;
+            document.getElementById('dateDisplay').textContent = dateString;
+        }
+
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // 粒子系统
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const particles = [];
+        const particleCount = 80;
+
+        class Particle {
+            constructor(x, y) {
+                this.x = x || Math.random() * canvas.width;
+                this.y = y || Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 0.8;
+                this.vy = (Math.random() - 0.5) * 0.8;
+                this.radius = Math.random() * 2.5 + 0.5;
+                this.color = `hsl(${Math.random() * 60 + 180}, 100%, 70%)`;
+                this.opacity = Math.random() * 0.6 + 0.2;
+                this.life = 1.0;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life -= 0.003;
+
+                // 边界检测
+                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity * this.life;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                
+                // 光晕效果
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = this.color;
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        // 初始化粒子
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
+
+        // 动画循环
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            particles.forEach((particle, index) => {
+                particle.update();
+                particle.draw();
+                
+                if (particle.life <= 0) {
+                    particles.splice(index, 1);
+                    particles.push(new Particle());
+                }
+            });
+
+            // 连接附近的粒子
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < 120) {
+                        ctx.save();
+                        ctx.globalAlpha = (120 - distance) / 120 * 0.2;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.strokeStyle = '#00e5ff';
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                }
+            }
+            
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        // 鼠标跟随效果
+        const cursorEffect = document.getElementById('cursorEffect');
+        const cursorTrails = [];
+        let mouseX = 0;
+        let mouseY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            cursorEffect.style.left = mouseX - 15 + 'px';
+            cursorEffect.style.top = mouseY - 15 + 'px';
+            
+            // 创建轨迹
+            const trail = document.createElement('div');
+            trail.className = 'cursor-trail';
+            trail.style.left = mouseX - 5 + 'px';
+            trail.style.top = mouseY - 5 + 'px';
+            document.body.appendChild(trail);
+            cursorTrails.push(trail);
+            
+            // 添加粒子
+            if (Math.random() > 0.85) {
+                particles.push(new Particle(mouseX, mouseY));
+            }
+            
+            // 限制轨迹数量
+            if (cursorTrails.length > 15) {
+                const oldTrail = cursorTrails.shift();
+                oldTrail.remove();
+            }
+            
+            // 淡出轨迹
+            cursorTrails.forEach((trail, index) => {
+                trail.style.opacity = index / cursorTrails.length * 0.8;
+            });
+        });
+
+        // 点击波纹效果
+        document.addEventListener('click', (e) => {
+            const ripple = document.createElement('div');
+            ripple.className = 'ripple';
+            ripple.style.left = e.clientX + 'px';
+            ripple.style.top = e.clientY + 'px';
+            document.body.appendChild(ripple);
+            
+            // 点击时创建爆炸粒子
+            for (let i = 0; i < 15; i++) {
+                const angle = (Math.PI * 2 / 15) * i;
+                const particle = new Particle(e.clientX, e.clientY);
+                particle.vx = Math.cos(angle) * 6;
+                particle.vy = Math.sin(angle) * 6;
+                particle.radius = Math.random() * 3 + 1;
+                particles.push(particle);
+            }
+            
+            setTimeout(() => ripple.remove(), 1200);
+        });
+
+        // 窗口大小调整
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // 添加键盘控制
+        document.addEventListener('keydown', (e) => {
+            if (e.key === ' ') {
+                // 空格键重置粒子
+                particles.length = 0;
+                for (let i = 0; i < particleCount; i++) {
+                    particles.push(new Particle());
+                }
+            }
+        });
+    </script>
+</body>
+</html>
