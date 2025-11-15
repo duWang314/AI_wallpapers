@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>炫酷交互桌面壁纸</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app" class="theme-neon">
+    <canvas id="bg-canvas"></canvas>
+
+    <header class="top-bar">
+      <div class="logo">Neo<span>Wall</span></div>
+      <div class="controls">
+        <button id="toggle-theme">切换主题</button>
+        <button id="toggle-anim">暂停动效</button>
+      </div>
+    </header>
+
+    <main class="main-layer">
+      <section class="clock-widget glass" id="clock-widget">
+        <div class="time" id="time-display">00:00:00</div>
+        <div class="date" id="date-display"></div>
+      </section>
+
+      <section class="stats-panel glass">
+        <h2>系统节奏</h2>
+        <div class="meters">
+          <div class="meter">
+            <span>CPU</span>
+            <div class="bar"><div class="fill" id="cpu-meter"></div></div>
+          </div>
+          <div class="meter">
+            <span>内存</span>
+            <div class="bar"><div class="fill" id="ram-meter"></div></div>
+          </div>
+          <div class="meter">
+            <span>网络</span>
+            <div class="bar"><div class="fill" id="net-meter"></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="orbit-panel glass">
+        <h2>互动星轨</h2>
+        <p>移动 / 点击鼠标，拖拽星球，感受桌面的律动。</p>
+        <div class="orbit" id="orbit-area">
+          <div class="planet" data-speed="1.2"></div>
+          <div class="planet" data-speed="0.8"></div>
+          <div class="planet" data-speed="1.6"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="bottom-bar">
+      <div class="hint">提示：拖拽卡片改变布局，双击重置。</div>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
