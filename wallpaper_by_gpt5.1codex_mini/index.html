@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Neon Pulse Desktop</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="wallpaper-shell">
+    <canvas class="starfield" id="starfield"></canvas>
+    <div class="grid-overlay"></div>
+    <header class="hero-panel">
+      <div>
+        <p class="label">Neon Pulse</p>
+        <h1>智动星际切换</h1>
+      </div>
+      <div class="time-panel">
+        <span id="digital-time">--:--:--</span>
+        <small>实时同步 | 鼠标拖拽即刻改变光柵</small>
+      </div>
+    </header>
+
+    <section class="holo-card">
+      <div class="pulse-ring"></div>
+      <div class="status">
+        <h2>实时感应</h2>
+        <p>
+          鼠标指针即刻驱动光点的流速，并可通过底部按钮切换模组，打造可互动的动态桌面氛围。保持点击即可保存当前色调。
+        </p>
+      </div>
+      <div class="control-row">
+        <button data-effect="pulse">脉冲</button>
+        <button data-effect="orbit">轨道</button>
+        <button data-effect="glow">光晕</button>
+      </div>
+    </section>
+
+    <section class="data-grid">
+      <article>
+        <h3>节点密度</h3>
+        <p id="density">0</p>
+      </article>
+      <article>
+        <h3>反应速度</h3>
+        <p>320ms</p>
+      </article>
+      <article>
+        <h3>活跃层</h3>
+        <p>主光域 + 扩展环</p>
+      </article>
+    </section>
+
+    <footer>
+      <p>探索更多：将此页面置于全屏浏览并设置为桌面背景，即刻拥有炫酷互动壁纸。</p>
+    </footer>
+  </div>
+  <script src="script.js" type="module"></script>
+</body>
+</html>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>炫酷互动桌面壁纸 - Cyber Nebula</title>
+<style>
+  * { margin:0; padding:0; overflow:hidden; }
+  body { 
+    background: #000; 
+    font-family: 'Arial', sans-serif;
+    cursor: none;
+  }
+  canvas { position: absolute; top:0; left:0; }
+  
+  /* 实时时钟 */
+  #clock {
+    position: absolute;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #00ffff;
+    font-size: 4vw;
+    letter-spacing: 8px;
+    text-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff;
+    z-index: 10;
+    pointer-events: none;
+  }
+  
+  /* 可拖动窗口 */
+  .window {
+    position: absolute;
+    width: 300px;
+    height: 200px;
+    background: rgba(10,20,40,0.8);
+    border: 1px solid #00ffff;
+    border-radius: 10px;
+    box-shadow: 0 0 30px #00ffff;
+    color: #00ffcc;
+    padding: 15px;
+    user-select: none;
+    cursor: move;
+    z-index: 20;
+    backdrop-filter: blur(10px);
+  }
+  .title-bar {
+    background: linear-gradient(90deg, #ff00ff, #00ffff);
+    padding: 8px;
+    border-radius: 8px 8px 0 0;
+    margin: -15px -15px 15px -15px;
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  /* 自定义鼠标 */
+  #cursor {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: radial-gradient(circle, #00ffff, transparent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.1s;
+    box-shadow: 0 0 20px #00ffff;
+  }
+  
+  /* 右键菜单 */
+  #contextMenu {
+    position: absolute;
+    background: rgba(0,10,30,0.95);
+    border: 1px solid #00ffff;
+    padding: 10px 0;
+    border-radius: 8px;
+    box-shadow: 0 0 30px #00ffff;
+    display: none;
+    z-index: 10000;
+  }
+  .menu-item {
+    padding: 10px 20px;
+    color: #00ffff;
+    cursor: pointer;
+  }
+  .menu-item:hover { background: #00ffff22; }
+</style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+<canvas id="particles"></canvas>
+<canvas id="grid"></canvas>
+<canvas id="ripple"></canvas>
+
+<div id="clock">88:88:88</div>
+<div id="cursor"></div>
+
+<!-- 示例可拖动窗口 -->
+<div class="window" style="top:20%;left:10%;">
+  <div class="title-bar">SYSTEM CORE</div>
+  <p>Neural Network Online<br>Energy: 100%<br>Status: HACKED</p>
+</div>
+
+<div class="window" style="top:50%;right:10%;">
+  <div class="title-bar">TERMINAL</div>
+  <p>> Welcome to Matrix_<br>> Loading awesomeness...</p>
+</div>
+
+<!-- 右键菜单 -->
+<div id="contextMenu">
+  <div class="menu-item" onclick="changeTheme()">切换主题：Neon Storm</div>
+  <div class="menu-item" onclick="alert('粒子爆炸模式已激活！')">爆炸模式</div>
+  <div class="menu-item" onclick="document.body.style.filter='invert(1)'">反转色彩</div>
+</div>
+
+<script>
+// ==================== 自定义鼠标 ====================
+const cursor = document.getElementById('cursor');
+document.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX - 10 + 'px';
+  cursor.style.top = e.clientY - 10 + 'px';
+});
+
+// ==================== 实时时钟 ====================
+function updateClock() {
+  const now = new Date();
+  const time = now.toLocaleTimeString('zh-CN', {hour12:false});
+  document.getElementById('clock').textContent = time;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ==================== 背景粒子星空 ====================
+const bg = document.getElementById('bg');
+const pCanvas = document.getElementById('particles');
+const gCanvas = document.getElementById('grid');
+const rCanvas = document.getElementById('ripple');
+
+const bw = bg.width = window.innerWidth;
+const bh = bg.height = window.innerHeight;
+const pw = pCanvas.width = bw;
+const ph = pCanvas.height = bh;
+const gw = gCanvas.width = bw;
+const gh = gCanvas.height = bh;
+const rw = rCanvas.width = bw;
+const rh = rCanvas.height = bh;
+
+const bgCtx = bg.getContext('2d');
+const pCtx = pCanvas.getContext('2d');
+const gCtx = gCanvas.getContext('2d');
+const rCtx = rCanvas.getContext('2d');
+
+let particles = [];
+let ripples = [];
+
+// 创建粒子
+for(let i = 0; i < 150; i++) {
+  particles.push({
+    x: Math.random() * pw,
+    y: Math.random() * ph,
+    vx: Math.random() * 2 - 1,
+    vy: Math.random() * 2 - 1,
+    radius: Math.random() * 3 + 1
+  });
+}
+
+// 粒子动画 + 鼠标连接线
+function animateParticles() {
+  pCtx.clearRect(0,0,pw,ph);
+  const mouseX = parseInt(cursor.style.left) + 10;
+  const mouseY = parseInt(cursor.style.top) + 10;
+  
+  particles.forEach(p => {
+    p.x += p.vx;
+    p.y += p.vy;
+    if(p.x < 0 || p.x > pw) p.vx *= -1;
+    if(p.y < 0 || p.y > ph) p.vy *= -1;
+    
+    pCtx.fillStyle = '#00ffff';
+    pCtx.beginPath();
+    pCtx.arc(p.x, p.y, p.radius, 0, Math.PI*2);
+    pCtx.fill();
+    
+    // 鼠标连接线
+    const dist = Math.hypot(p.x - mouseX, p.y - mouseY);
+    if(dist < 150) {
+      pCtx.strokeStyle = `rgba(0,255,255,${1 - dist/150})`;
+      pCtx.lineWidth = 1;
+      pCtx.beginPath();
+      pCtx.moveTo(p.x, p y);
+      pCtx.lineTo(mouseX, mouseY);
+      pCtx.stroke();
+    }
+  });
+  
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+// ==================== 3D网格地平线 ====================
+let offset = 0;
+function drawGrid() {
+  gCtx.clearRect(0,0,gw,gh);
+  gCtx.strokeStyle = '#0088ff44';
+  gCtx.lineWidth = 1;
+  const step = 40;
+  offset += 1;
+  
+  for(let y = 0; y < gh; y += step) {
+    for(let x = 0; x < gw; x += step) {
+      const sx = x + (y - gh/2) * 0.2 + offset;
+      const sy = y;
+      gCtx.beginPath();
+      if(x > 0) gCtx.moveTo(sx - step, sy);
+      gCtx.lineTo(sx, sy);
+      gCtx.stroke();
+    }
+  }
+  requestAnimationFrame(drawGrid);
+}
+drawGrid();
+
+// ==================== 能量波纹 ====================
+document.addEventListener('click', e => {
+  if(e.target === document.body || e.target.tagName === 'CANVAS') {
+    ripples.push({
+      x: e.clientX,
+      y: e.clientY,
+      radius: 0,
+      alpha: 1
+    });
+    
+    // 爆炸粒子
+    for(let i=0; i<30; i++) {
+      particles.push({
+        x: e.clientX,
+        y: e.clientY,
+        vx: Math.random()*20-10,
+        vy: Math.random()*20-10,
+        radius: Math.random()*4+2,
+        life: 60
+      });
+    }
+  }
+});
+
+function animateRipples() {
+  rCtx.clearRect(0,0,rw,rh);
+  ripples = ripples.filter(r => {
+    r.radius += 5;
+    r.alpha -= 0.01;
+    rCtx.strokeStyle = `rgba(0,255,255,${r.alpha})`;
+    rCtx.lineWidth = 3;
+    rCtx.beginPath();
+    rCtx.arc(r.x, r.y, r.radius, 0, Math.PI*2);
+    rCtx.stroke();
+    return r.alpha > 0;
+  });
+  requestAnimationFrame(animateRipples);
+}
+animateRipples();
+
+// ==================== 可拖动窗口 ====================
+document.querySelectorAll('.window').forEach(win => {
+  let isDragging = false, px=0, py=0;
+  win.querySelector('.title-bar').addEventListener('mousedown', e => {
+    isDragging = true;
+    px = e.clientX - win.offsetLeft;
+    py = e.clientY - win.offsetTop;
+  });
+  document.addEventListener('mousemove', e => {
+    if(isDragging) {
+      win.style.left = e.clientX - px + 'px';
+      win.style.top = e.clientY - py + 'px';
+    }
+  });
+  document.addEventListener('mouseup', () => isDragging = false);
+});
+
+// ==================== 右键菜单 ====================
+const menu = document.getElementById('contextMenu');
+document.addEventListener('contextmenu', e => {
+  e.preventDefault();
+  menu.style.display = 'block';
+  menu.style.left = e.clientX + 'px';
+  menu.style.top = e.clientY + 'px';
+});
+document.addEventListener('click', () => menu.style.display = 'none');
+
+function changeTheme() {
+  const colors = ['#ff00ff','#00ff00','#ffff00','#ff4400'];
+  const c = colors[Math.floor(Math.random()*colors.length)];
+  document.documentElement.style.setProperty('--neon', c);
+  document.body.style.boxShadow = `inset 0 0 200px ${c}44`;
+  alert('主题已切换为 ' + c);
+}
+
+// 窗口自适应
+window.addEventListener('resize', () => location.reload());
+
+</script>
+</body>
+</html>
