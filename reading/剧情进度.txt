@@ -3,4 +3,4 @@ END8-1 尾声，抑或开始
 JavaScript Tutorial Full Course - Beginner to Pro 15:30
 数字逻辑PPT: 03_23
 计算机系统基础PPT: 01_62
-vim: 第二讲第三节
+vim: 第三讲第三节
